@@ -66,6 +66,9 @@ class QueueHandlder:
         else :
             print("Other Com")
             pass
+    def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4):
+        ret = Comm_class.Print_QRCode(QrcodeData,nWidth,nVersion,nErrlevenl)
+        return ret
     
     def start_read_thread(self,comtype):
         log = "新增一个读队列线程："
@@ -78,6 +81,7 @@ class QueueHandlder:
         self.running = False
         log = "关闭读队列线程"
         log_message(log,logging.DEBUG)
+
 
 queue_handler = QueueHandlder()
 

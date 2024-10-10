@@ -59,7 +59,9 @@ class Dll_Init:
         self.mylib.Port_EnumCOM.argtypes = [ctypes.c_char_p, ctypes.c_size_t]
         self.mylib.Port_EnumCOM.restype = ctypes.c_size_t
         self.buffer_serial = ctypes.create_string_buffer(self.buffer_size)
-
+        #打印二维码
+        self.mylib.Pos_Qrcode.argtypes = [ctypes.c_wchar_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        self.mylib.Pos_Qrcode.restype = ctypes.c_bool
     #列出USB接口
     def List_UsbCom(self):
         if not self.Dll_Flag :
@@ -171,6 +173,9 @@ class Dll_Init:
         ret = self.mylib.Pos_SelfTest()
         return ret 
     
+    def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4):
+        ret = self.mylib.Pos_Qrcode(QrcodeData,nWidth,nVersion,nErrlevenl)
+        return ret
 Comm_class = Dll_Init()
 if __name__ == "__main__":
 

@@ -353,7 +353,19 @@ class Esc_Test:
             self.Image_entry.insert(0,FilePath)
 
     def Qrcode_Prn(self):
-        pass
+        QrCodeData = self.QRCodeData_entry.get()
+        QrCodeWidth = self.QRcodeWitdth_enrty.get()
+        Qrcodelevel = self.QRcodelevel_enrty.get()
+        QrcodeSize = self.QRcodeSize_enrty.get()
+        #纠错等级
+        Qrcodelevels = {
+            '纠错等级1': "1",
+            '纠错等级2': "2",
+            '纠错等级3': "3",
+            '纠错等级4': "4 ",
+        }
+        Codelevel = Qrcodelevels.get(Qrcodelevel, "2")
+        queue_handler.Print_QRCode(QrCodeData,int(QrCodeWidth),int(QrcodeSize),int(Codelevel))
 
     def Barcode_Prn(self):
         #条形码的宽度
