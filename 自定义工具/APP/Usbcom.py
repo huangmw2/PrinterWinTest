@@ -172,10 +172,18 @@ class Dll_Init:
     def Print_selfTest(self):
         ret = self.mylib.Pos_SelfTest()
         return ret 
-    
+    #打印二位码
     def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4):
         ret = self.mylib.Pos_Qrcode(QrcodeData,nWidth,nVersion,nErrlevenl)
         return ret
+    #打印12.5%票据速度
+    def Print_SpeedData(self,Data,ComType):
+        if ComType == "串口":
+            self.Write_serialCom(Data)
+        elif ComType == "USB":
+            self.Write_Usbdata(Data)
+        else :
+            pass
 Comm_class = Dll_Init()
 if __name__ == "__main__":
 

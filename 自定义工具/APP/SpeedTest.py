@@ -1,7 +1,22 @@
 # speed_test.py
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import time
+import struct
+import os
+import logging
+
+try:
+    from APP.Usbcom import Comm_class  # 绝对导入
+except ImportError:
+    from Usbcom import Comm_class  # 相对导入
+
+if __name__ == "__main__":
+    from Queue import queue_handler
+    from Log import log_message  
+else :
+    from APP.Queue import queue_handler
+    from APP.Log import log_message 
 
 class Speed_Test:
     def __init__(self, parent):   
@@ -10,8 +25,12 @@ class Speed_Test:
         self.elapsed_time = 0  # 保存已经过去的时间
         self.timer_id = None  # 保存 after() 的定时器 ID
         self.Print_speed = 0
-        self.threeinches_path = ""
-        self.twoinches_path = ""
+        # 创建存储速度数据的列表
+        self.AveSpeed_data = []
+
+        self.threeinches_path = os.getcwd() + r"\Data\Speed\threeinches.hex"
+        self.twoinches_path =  os.getcwd() + r"\Data\Speed\twoinches.hex"
+        
         if __name__ == "__main__":
             self.root = parent
             self.root.title("Speed测试")
@@ -66,32 +85,106 @@ class Speed_Test:
         self.speed_set_button = tk.Button(self.frame, text="速度设置", width=10, command=self.Print_speed_set,font=("仿宋",12))
         self.speed_set_button.place(x=210,y=240)  # 垂直方向上部分间距为20像素
 
-		
+        #平均速度
+        self.label_AveSpeed = tk.Label(self.frame, text="平均速度：",font=("仿宋",12,"bold"))
+        self.label_AveSpeed.place(x=10,y=270)
+        self.AveSpeed_entry = tk.Entry(self.frame,width=10)
+        self.AveSpeed_entry.place(x=100,y=270)
+        # 禁止键盘输入的绑定
+        self.AveSpeed_entry.bind("<Key>", lambda e: "break")
+        self.AveSpeed_entry.config(state='disabled')
+
         # 开始和复位按钮
         self.start_stop_button = tk.Button(self.frame, text="开始", width=10, command=self.start_stop_timer,font=("仿宋",12),bg="green")
-        self.start_stop_button.place(x=0,y=280)  
+        self.start_stop_button.place(x=0,y=310)  
 		
         self.reset_button = tk.Button(self.frame, text="复位", width=10, command=self.reset_timer,font=("仿宋",12))
-        self.reset_button.place(x=120,y=280)  
+        self.reset_button.place(x=120,y=310)  
 
-        # 强制结束按钮
-        self.confirm_button = tk.Button(self.frame, text="保存", width=10, command=self.save_data,font=("仿宋",12))
-        self.confirm_button.place(x=240,y=280) 
-		#清空文件
-        #self.clear_data()
+        # 平均速度按钮
+        self.AverageSpeed_button = tk.Button(self.frame, text="平均速度", width=10, command=self.average_speed,font=("仿宋",12))
+        self.AverageSpeed_button.place(x=240,y=310) 
+
+		#清除数据按钮
+        self.ClearSpeedData_button = tk.Button(self.frame, text="清除数速度数据", width=14, command=self.ClearAveData,font=("仿宋",12))
+        self.ClearSpeedData_button.place(x=360,y=310)
 
     def Print_speed_set(self):
-        print("test")
+        start_flag = b'\x02\x00'
+        command = struct.pack('<H', 0x92)  # 小端格式的命令
+        param_h = b'\x00\x00'
+        param_l = b'\x00\x00'
+        device_id = b'\x00\x00\x00\x00'  # 设备ID
+        data_length = 2
+        data_length_bytes = struct.pack('<H', data_length)  # 小端格式的数据长度
+        # 计算校验和
+        checksum = start_flag[0] ^ start_flag[1] ^ command[0] ^ command[1]
+        checksum ^= param_h[0] ^ param_h[1] ^ param_l[0] ^ param_l[1]
+        checksum ^= device_id[0] ^ device_id[1] ^ device_id[2] ^ device_id[3]
+        checksum ^= data_length_bytes[0] ^ data_length_bytes[1]
+        #命令
+        speed = self.speep_entry.get()
+        com_data = b'\x83' + struct.pack('B', int(speed))
+        # 对数据部分进行异或计算
+        com_data_checksum = 0
+        for byte in com_data:
+            com_data_checksum ^= byte   
+        # 创建包
+        packet = start_flag + command + param_h + param_l + device_id + data_length_bytes + bytes([checksum]) + b'\x00' + com_data + bytes([com_data_checksum]) 
+        log = "设置打印速度为：" + speed      
+        queue_handler.write_to_queue(packet,log) 
+        #设置参数，后续可能需要显示设置成功或者失败
 
     def start_stop_timer(self):
+        if not os.path.exists(self.twoinches_path):
+            log = "没有找到2寸速度测试数据的路径:{}".format(self.twoinches_path)
+            log_message(log,logging.ERROR)
+            return 
+        if not os.path.exists(self.threeinches_path):
+            log = "没有找到3寸速度测试数据的路径:{}".format(self.threeinches_path)
+            log_message(log,logging.ERROR)
+            return 
+        
         if not self.is_running:
+            inches = self.size_option.get()
+            SendType = self.send_option.get()
+            Comtype = queue_handler.Get_ComType()
+            if inches == "two_inches":
+                try:
+                    with open(self.twoinches_path, 'r') as file:
+                        content = file.read()
+                except Exception as e:
+                    messagebox.showerror("错误", "打开2寸文件错误")
+                log = "2寸速度测试"
+            elif inches == "three_inches":
+                try:
+                    with open(self.threeinches_path, 'r') as file:
+                        content = file.read()
+                except Exception as e:
+                    messagebox.showerror("错误", "打开3寸文件错误")
+                log = "3寸速度测试"
+            else :
+                pass
+            if not content:
+                messagebox.showerror("错误", "速测测试数据为空")
+                return 
+            byte_data = bytes.fromhex(content)
+            log_message(log,logging.DEBUG)
+            for widget in self.frame.winfo_children():
+                widget.config(state='disabled')
+            # 仅保留停止按钮可用
+            self.start_stop_button.config(state='normal')
+            if SendType == "start_after_send":
+                Comm_class.Print_SpeedData(byte_data,Comtype)
             # 开始计时
             self.is_running = True
             self.start_stop_button.config(text="停止", bg="red")
             self.start_time = time.time() - self.elapsed_time  # 记录开始时间，考虑已经过去的时间
             self.update_timer()  # 启动计时器
             self.start_stop_button.config(text="停止", bg="red")
-            # 在这里添加计时功能代码
+            if SendType == "start_timer":
+                Comm_class.Print_SpeedData(byte_data,Comtype)
+    
         else:
             # 停止计时
             self.is_running = False
@@ -104,6 +197,11 @@ class Speed_Test:
             speed_format = f"速度:{int(self.Print_speed):03d}mm/s"
             self.label2.config(text=speed_format)
             # 在这里添加停止计时功能代码
+            for widget in self.frame.winfo_children():
+                widget.config(state='normal')
+            self.AveSpeed_entry.config(state='disabled')
+            if self.Print_speed :
+                self.AveSpeed_data.append(self.Print_speed)
 
     def update_timer(self):
         # 计算已经过去的时间
@@ -125,8 +223,16 @@ class Speed_Test:
         if self.timer_id:
             self.frame.after_cancel(self.timer_id)
         
-    def save_data(self):
-        print("test")
+    def average_speed(self):
+        if self.AveSpeed_data:
+            # 计算平均速度
+            avg_speed = sum(self.AveSpeed_data) / len(self.AveSpeed_data)
+            speed_format = f"{int(avg_speed):03d}mm/s"
+            self.AveSpeed_entry.delete(0, tk.END)
+            self.AveSpeed_entry.insert(speed_format)
+    def ClearAveData(self):
+        self.AveSpeed_data = []
+        self.AveSpeed_entry.delete(0, tk.END) #请假控件列表
 
     def SetPaperLength(self):
         Paperlength = int(self.Paperlength_entry.get())

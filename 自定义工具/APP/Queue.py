@@ -11,7 +11,7 @@ except ImportError:
     from Log import log_message  # 相对导入    
 
 max_size_queue = 100
-
+Queue_Comtype = None
 
 class QueueHandlder:
     def __init__(self):
@@ -29,6 +29,9 @@ class QueueHandlder:
 
     def read_from_queue(self,comtype):
         max_chunk_size = 32_768
+        global Queue_Comtype
+        Queue_Comtype = comtype
+
         while self.running:
             if not self.write_queue.empty():
                 item = self.write_queue.get()
@@ -51,6 +54,9 @@ class QueueHandlder:
         #重新为True，否则下次进来不会发执行读队列
         self.running = True
 
+    def Get_ComType(self):
+        return Queue_Comtype
+    
     def Send_data(self,Com_type,Data=0):
         if Com_type == "USB":
             result = Comm_class.Write_Usbdata(Data)
