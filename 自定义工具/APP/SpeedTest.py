@@ -92,7 +92,6 @@ class Speed_Test:
         self.AveSpeed_entry.place(x=100,y=270)
         # 禁止键盘输入的绑定
         self.AveSpeed_entry.bind("<Key>", lambda e: "break")
-        self.AveSpeed_entry.config(state='disabled')
 
         # 开始和复位按钮
         self.start_stop_button = tk.Button(self.frame, text="开始", width=10, command=self.start_stop_timer,font=("仿宋",12),bg="green")
@@ -106,8 +105,15 @@ class Speed_Test:
         self.AverageSpeed_button.place(x=240,y=310) 
 
 		#清除数据按钮
-        self.ClearSpeedData_button = tk.Button(self.frame, text="清除数速度数据", width=14, command=self.ClearAveData,font=("仿宋",12))
+        self.ClearSpeedData_button = tk.Button(self.frame, text="清除数据", width=14, command=self.ClearAveData,font=("仿宋",12))
         self.ClearSpeedData_button.place(x=360,y=310)
+
+        #log框
+        self.Speed_text = tk.Text(self.frame, height=8, width=55)
+        self.Speed_text.place(x=5,y=360)
+        self.Speed_text.insert(tk.END,"Log区:\n")
+        # 禁止键盘输入的绑定
+        self.Speed_text.bind("<Key>", lambda e: "break")
 
     def Print_speed_set(self):
         start_flag = b'\x02\x00'
@@ -199,10 +205,11 @@ class Speed_Test:
             # 在这里添加停止计时功能代码
             for widget in self.frame.winfo_children():
                 widget.config(state='normal')
-            self.AveSpeed_entry.config(state='disabled')
             if self.Print_speed :
                 self.AveSpeed_data.append(self.Print_speed)
-
+            count = len(self.AveSpeed_data)
+            log_fromat = f"No.{count} 纸张长度：{Paperlength}mm,打印时间：{self.elapsed_time:.2f},打印速度：{self.Print_speed:.2f}\n"
+            self.Speed_text.insert(tk.END,log_fromat)
     def update_timer(self):
         # 计算已经过去的时间
         self.elapsed_time = time.time() - self.start_time
@@ -227,13 +234,17 @@ class Speed_Test:
         if self.AveSpeed_data:
             # 计算平均速度
             avg_speed = sum(self.AveSpeed_data) / len(self.AveSpeed_data)
+            print(f"avg_speed={avg_speed}")
             speed_format = f"{int(avg_speed):03d}mm/s"
             self.AveSpeed_entry.delete(0, tk.END)
-            self.AveSpeed_entry.insert(speed_format)
+            self.AveSpeed_entry.insert(0,speed_format)
+            
     def ClearAveData(self):
         self.AveSpeed_data = []
-        self.AveSpeed_entry.delete(0, tk.END) #请假控件列表
-
+        self.AveSpeed_entry.delete(0, tk.END) #清除控件列表
+        self.Speed_text.delete(1.0, tk.END)  #清除文本框控件列表
+        self.Speed_text.insert(tk.END,"Log区:\n")
+        
     def SetPaperLength(self):
         Paperlength = int(self.Paperlength_entry.get())
         PrintTime = int(self.elapsed_time*10)
