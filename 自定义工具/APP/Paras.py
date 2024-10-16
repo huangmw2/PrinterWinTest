@@ -1,6 +1,25 @@
 #Paras Test
 import tkinter as tk
 from tkinter import ttk
+from enum import Enum
+
+
+class button_fun(Enum):
+    BAUD_RATE_FUN = 0
+    FLOW_FUN = 1
+    LANGUGE_FUN = 2
+    PART1_FUN = 3
+    PART2_FUN = 4
+    SETALL_FUN = 5
+    RESET_FUN = 6
+    BLACK_DISTAN_FUN = 7
+    BLACK_WIDTH_FUN =8
+    BLACK_FEED_FUN = 9
+    BLACK_ENABLE_FUN =10
+    BLACK_DISABILITY_FUN = 11
+    BLACK_FIND_FUN = 12
+    BLACK_FINDCUT_FUN = 13
+    BLACK_PRINTTEST_FUN =14
 
 class Paras_Set:
     def __init__(self,parent):
@@ -43,7 +62,7 @@ class Paras_Set:
         self.baud_rate.place(x=50,y=5)
         self.baud_rate.set("9600")  # 默认值
 
-        set_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(0))
+        set_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.BAUD_RATE_FUN))
         set_button.place(x=150,y=0)   
         #流控
         self.flow_label = tk.Label(self.Basic_frame, text="流控:")
@@ -52,7 +71,7 @@ class Paras_Set:
         self.flow_control = ttk.Combobox(self.Basic_frame, values=self.flow_control_value, state="readonly",width=10)
         self.flow_control.place(x=50,y=45)
         self.flow_control.set("硬件流控")  # 默认值
-        set_flow_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(1))
+        set_flow_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.FLOW_FUN))
         set_flow_button.place(x=150,y=40)   
         #流控
         self.languge_label = tk.Label(self.Basic_frame, text="语言:")
@@ -61,7 +80,7 @@ class Paras_Set:
         self.languge_entry = encoding = ttk.Combobox(self.Basic_frame, values=self.language_entry_value, state="readonly",width=20)
         self.languge_entry = encoding.place(x=50,y=85)
         self.languge_entry = encoding.set("UTF-8")  # 默认值
-        self.set_languge_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(2))
+        self.set_languge_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.LANGUGE_FUN))
         self.set_languge_button.place(x=150,y=110) 
 
         #part 2
@@ -102,7 +121,7 @@ class Paras_Set:
         self.knifeSwitch =tk.Checkbutton(self.Part_frame, text="切刀", variable=self.knife_var)
         self.knifeSwitch.place(x=70,y=120)
 
-        self.partset_button = tk.Button(self.Part_frame, text="设置", width=8, command=lambda:self.SetParas(3))
+        self.partset_button = tk.Button(self.Part_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.PART1_FUN))
         self.partset_button.place(x=125,y=120) 
 
         #Part 3
@@ -125,23 +144,93 @@ class Paras_Set:
         self.shutdowns_label = tk.Label(self.Part2_frame, text="秒")
         self.shutdowns_label.place(x=140,y=30)
 
-        self.part2set_button = tk.Button(self.Part2_frame, text="设置", width=8, command=lambda:self.SetParas(4))
+        self.part2set_button = tk.Button(self.Part2_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.PART2_FUN))
         self.part2set_button.place(x=170,y=20) 
 
         #Part 4
-        self.SetAllParas_button = tk.Button(self.frame, text="设置全部参数", width=30, command=lambda:self.SetParas(5))
+        self.SetAllParas_button = tk.Button(self.frame, text="设置全部参数", width=30, command=lambda:self.SetParas(button_fun.SETALL_FUN))
         self.SetAllParas_button.place(x=450,y=80)        
 
-        self.ResetParas_button = tk.Button(self.frame, text="恢复默认设置", width=30, command=lambda:self.SetParas(6))
+        self.ResetParas_button = tk.Button(self.frame, text="恢复默认设置", width=30, command=lambda:self.SetParas(button_fun.RESET_FUN))
         self.ResetParas_button.place(x=450,y=120)
 
         #黑标设置
-        self.blackmark_frame = ttk.LabelFrame(self.frame, text="黑标设置",width=680,height=100)
+        self.blackmark_frame = ttk.LabelFrame(self.frame, text="黑标设置",width=680,height=120)
         self.blackmark_frame.place(x=0,y=175)   
+        self.blackmark_frame.grid_propagate(False)
+
+        #查找距离
+        self.black_mark_dis = "300"
+        self.create_label_entry_button(self.blackmark_frame, 0,"黑标查找距离", self.black_mark_dis, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_DISTAN_FUN))
+        #黑标宽度
+        self.black_mark_width = "40"
+        self.create_label_entry_button(self.blackmark_frame,1, "黑标宽度", self.black_mark_width, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_WIDTH_FUN))    
+        #黑标宽度
+        self.black_mark_feed = "40"
+        self.create_label_entry_button(self.blackmark_frame,2, "找到黑标后进纸", self.black_mark_feed, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_FEED_FUN))    
+        #设置黑标模式
+        self.Create_black_button(self.blackmark_frame ,"设置黑标模式", 350,5,lambda:self.SetParas(button_fun.BLACK_ENABLE_FUN))         
+        #取消黑标模式
+        self.Create_black_button(self.blackmark_frame ,"取消黑标模式", 500,5,lambda:self.SetParas(button_fun.BLACK_DISABILITY_FUN))   
+        #查找黑标
+        self.Create_black_button(self.blackmark_frame ,"查找黑标", 300,50,lambda:self.SetParas(button_fun.BLACK_FIND_FUN))   
+        #查找黑标并切纸
+        self.Create_black_button(self.blackmark_frame ,"查找黑标并切纸", 400,50,lambda:self.SetParas(button_fun.BLACK_FINDCUT_FUN))    
+        #打印测试
+        self.Create_black_button(self.blackmark_frame ,"打印测试", 550,50,lambda:self.SetParas(button_fun.BLACK_PRINTTEST_FUN))
+
+        #产品设置
+        self.product_frame = ttk.LabelFrame(self.frame, text="产品设置",width=430,height=160)
+        self.product_frame.place(x=0,y=295)   
+        self.product_frame.grid_propagate(False)
+
+        #USB 接口类型
+        self.USBType = ["打印口","虚拟串口"]
+        self.create_label_Combobox_button(self.product_frame,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(15))
+        #纸张类型
+        self.PaperType = ["热敏票据纸","热敏标签纸","热敏孔洞纸","热敏黑标纸"]
+        self.create_label_Combobox_button(self.product_frame,1,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(16))
+        #打印顺序
+        self.PrintOrder = ["倒叙","正序"]
+        self.create_label_Combobox_button(self.product_frame,2,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(17))
+        #票据回收时间
+        self.RecytingTime = ["2","5","10","15","20","30","60"]
+        self.create_label_Combobox_button(self.product_frame,3,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(18))
+    # 创建一个统一的标签输入框和按钮布局
+    def create_label_entry_button(self,frame,rows,label_text,entry_value,unit_text,button_text,butonn_fun):
+ 
+        label = tk.Label(frame, text=label_text)
+        label.grid(row=rows, column=0, padx=1, pady=1)
+
+        entry = tk.Entry(frame, width=10)
+        entry.insert(0, entry_value)
+        entry.grid(row=rows, column=1, padx=1, pady=1)      
+
+        unit_label = tk.Label(frame, text=unit_text)
+        unit_label.grid(row=rows, column=2, padx=1, pady=1) 
         
-             
+        button = tk.Button(frame, text=button_text,command=butonn_fun,width=10)
+        button.grid(row=rows, column=3, padx=1, pady=1) 
+       
+    def Create_black_button(self,frame,name,site_x,site_y,fun):
+        button = tk.Button(frame, text=name,command=fun,font=("仿宋",12))
+        button.place(x=site_x,y=site_y) 
+
+    # 创建一个统一的标签输入框和按钮布局
+    def create_label_Combobox_button(self,frame,rows,label_text,Combobox_value,default,button_text,butonn_fun):
+ 
+        label = tk.Label(frame, text=label_text)
+        label.grid(row=rows, column=0, padx=5, pady=1,sticky="w")
+
+        Combobox = ttk.Combobox(frame, values=Combobox_value, state="readonly",width=12)
+        Combobox.grid(row=rows, column=1, padx=5, pady=1)
+        Combobox.set(default)  # 默认
+        
+        button = tk.Button(frame, text=button_text,command=butonn_fun,width=8)
+        button.grid(row=rows, column=2, padx=5, pady=1) 
+
     def SetParas(self,Num):
-        print(f"num={Num}")
+        print(f"num={Num.value}")
 if __name__ == "__main__":
     root = tk.Tk()
     app = Paras_Set(root)

@@ -18,6 +18,8 @@ set_mode_button.pack(side=tk.LEFT, padx=20)
 cancel_mode_button = ttk.Button(mode_frame, text="取消黑标模式")
 cancel_mode_button.pack(side=tk.LEFT, padx=20)
 
+#创建一个按钮   
+
 # 创建一个统一的标签输入框和按钮布局
 def create_label_entry_button(frame, label_text, entry_value, unit_text, button_text):
     row_frame = tk.Frame(frame)
