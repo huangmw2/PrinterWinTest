@@ -155,7 +155,7 @@ class Paras_Set:
         self.ResetParas_button.place(x=450,y=120)
 
         #黑标设置
-        self.blackmark_frame = ttk.LabelFrame(self.frame, text="黑标设置",width=680,height=120)
+        self.blackmark_frame = ttk.LabelFrame(self.frame, text="黑标设置",width=550,height=120)
         self.blackmark_frame.place(x=0,y=175)   
         self.blackmark_frame.grid_propagate(False)
 
@@ -169,33 +169,80 @@ class Paras_Set:
         self.black_mark_feed = "40"
         self.create_label_entry_button(self.blackmark_frame,2, "找到黑标后进纸", self.black_mark_feed, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_FEED_FUN))    
         #设置黑标模式
-        self.Create_black_button(self.blackmark_frame ,"设置黑标模式", 350,5,lambda:self.SetParas(button_fun.BLACK_ENABLE_FUN))         
+        self.Create_black_button(self.blackmark_frame ,"设置黑标模式", 300,10,lambda:self.SetParas(button_fun.BLACK_ENABLE_FUN))         
         #取消黑标模式
-        self.Create_black_button(self.blackmark_frame ,"取消黑标模式", 500,5,lambda:self.SetParas(button_fun.BLACK_DISABILITY_FUN))   
+        self.Create_black_button(self.blackmark_frame ,"取消黑标模式", 300,50,lambda:self.SetParas(button_fun.BLACK_DISABILITY_FUN))   
         #查找黑标
-        self.Create_black_button(self.blackmark_frame ,"查找黑标", 300,50,lambda:self.SetParas(button_fun.BLACK_FIND_FUN))   
+        self.Create_black_button(self.blackmark_frame ,"查找黑标", 420,5,lambda:self.SetParas(button_fun.BLACK_FIND_FUN))   
         #查找黑标并切纸
-        self.Create_black_button(self.blackmark_frame ,"查找黑标并切纸", 400,50,lambda:self.SetParas(button_fun.BLACK_FINDCUT_FUN))    
+        self.Create_black_button(self.blackmark_frame ,"查找黑标并切纸", 420,32,lambda:self.SetParas(button_fun.BLACK_FINDCUT_FUN))    
         #打印测试
-        self.Create_black_button(self.blackmark_frame ,"打印测试", 550,50,lambda:self.SetParas(button_fun.BLACK_PRINTTEST_FUN))
+        self.Create_black_button(self.blackmark_frame ,"打印测试", 420,60,lambda:self.SetParas(button_fun.BLACK_PRINTTEST_FUN))
 
         #产品设置
-        self.product_frame = ttk.LabelFrame(self.frame, text="产品设置",width=430,height=160)
+        self.product_frame = ttk.LabelFrame(self.frame, text="产品设置",width=550,height=178)
         self.product_frame.place(x=0,y=295)   
         self.product_frame.grid_propagate(False)
 
         #USB 接口类型
         self.USBType = ["打印口","虚拟串口"]
-        self.create_label_Combobox_button(self.product_frame,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(15))
+        self.create_label_Combobox_button(self.product_frame,0,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(15))
         #纸张类型
         self.PaperType = ["热敏票据纸","热敏标签纸","热敏孔洞纸","热敏黑标纸"]
-        self.create_label_Combobox_button(self.product_frame,1,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(16))
+        self.create_label_Combobox_button(self.product_frame,1,0,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(16))
         #打印顺序
         self.PrintOrder = ["倒叙","正序"]
-        self.create_label_Combobox_button(self.product_frame,2,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(17))
+        self.create_label_Combobox_button(self.product_frame,2,0,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(17))
         #票据回收时间
         self.RecytingTime = ["2","5","10","15","20","30","60"]
-        self.create_label_Combobox_button(self.product_frame,3,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(18))
+        self.create_label_Combobox_button(self.product_frame,3,0,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(18))
+        #纸张规则
+        self.PaperFormat = ["1寸","2寸","3寸","4寸"]
+        self.create_label_Combobox_button(self.product_frame,4,0,"纸张规则",self.PaperFormat,self.PaperFormat[2],"设置",lambda:self.SetParas(19))
+        #浓度等级
+        self.Desitylevel = ["浓度等级1","浓度等级2","浓度等级3","浓度等级4","浓度等级5","浓度等级6","浓度等级7","浓度等级8"]
+        self.create_label_Combobox_button(self.product_frame,0,3,"浓度等级",self.Desitylevel,self.Desitylevel[3],"设置",lambda:self.SetParas(20))
+        #走纸键
+        self.FeedPaperKey = ["关闭","开启"]
+        self.create_label_Combobox_button(self.product_frame,1,3,"走纸键",self.FeedPaperKey,self.FeedPaperKey[0],"设置",lambda:self.SetParas(21))
+        #打印机协议
+        self.PrintProcotol = ["ESC","TSPL","CPCL"]
+        self.create_label_Combobox_button(self.product_frame,2,3,"打印机协议",self.PrintProcotol,self.PrintProcotol[0],"设置",lambda:self.SetParas(22))
+        #堵纸侦测
+        self.PaperJam = ["关闭","开启"]
+        self.create_label_Combobox_button(self.product_frame,3,3,"堵纸侦测",self.PaperJam,self.PaperJam[0],"设置",lambda:self.SetParas(23))   
+        #打印速度
+        self.PrintSpeed = ["1","2","3","4","5","6","7","8"]
+        self.create_label_Combobox_button(self.product_frame,4,3,"打印速度",self.PrintSpeed,self.PrintSpeed[0],"设置",lambda:self.SetParas(24))     
+
+        #设备名称
+        self.devicename_frame = ttk.LabelFrame(self.frame, text="设备名称",width=150,height=175)
+        self.devicename_frame.place(x=550,y=175)   
+        self.devicename_frame.grid_propagate(False)
+
+        self.decicename_label = tk.Label(self.devicename_frame, text="产品名称:")
+        self.decicename_label.grid(row=0, column=0, padx=1, pady=2,sticky="w")
+
+        self.decicename_lentry = tk.Entry(self.devicename_frame, width=18)
+        self.decicename_lentry.grid(row=1, column=0, padx=1, pady=2,sticky="w")
+
+        self.decicenum_label = tk.Label(self.devicename_frame, text="产品序列号:")
+        self.decicenum_label.grid(row=3, column=0, padx=1, pady=2,sticky="w")
+
+        self.decicenum_lentry = tk.Entry(self.devicename_frame, width=18)
+        self.decicenum_lentry.grid(row=4, column=0, padx=1, pady=2,sticky="w")
+
+        self.deveice_button = tk.Button(self.devicename_frame, text="设置",command=lambda:self.SetParas(25),width=12)
+        self.deveice_button .grid(row=5, column=0, padx=1, pady=5) 
+
+        #log区
+        self.Log_frame = ttk.LabelFrame(self.frame, text="Log区",width=150,height=120)
+        self.Log_frame.place(x=550,y=350)  
+
+        self.Log_text = tk.Text(self.Log_frame, height=7, width=20)
+        self.Log_text.place(x=0,y=0)
+        # 禁止键盘输入的绑定
+        self.Log_text.bind("<Key>", lambda e: "break")      
     # 创建一个统一的标签输入框和按钮布局
     def create_label_entry_button(self,frame,rows,label_text,entry_value,unit_text,button_text,butonn_fun):
  
@@ -213,21 +260,21 @@ class Paras_Set:
         button.grid(row=rows, column=3, padx=1, pady=1) 
        
     def Create_black_button(self,frame,name,site_x,site_y,fun):
-        button = tk.Button(frame, text=name,command=fun,font=("仿宋",12))
+        button = tk.Button(frame, text=name,command=fun,font=("仿宋",10,"bold"))
         button.place(x=site_x,y=site_y) 
 
     # 创建一个统一的标签输入框和按钮布局
-    def create_label_Combobox_button(self,frame,rows,label_text,Combobox_value,default,button_text,butonn_fun):
+    def create_label_Combobox_button(self,frame,rows,columns,label_text,Combobox_value,default,button_text,butonn_fun):
  
         label = tk.Label(frame, text=label_text)
-        label.grid(row=rows, column=0, padx=5, pady=1,sticky="w")
+        label.grid(row=rows, column=columns+0, padx=5, pady=1,sticky="w")
 
         Combobox = ttk.Combobox(frame, values=Combobox_value, state="readonly",width=12)
-        Combobox.grid(row=rows, column=1, padx=5, pady=1)
+        Combobox.grid(row=rows, column=columns+1, padx=5, pady=1)
         Combobox.set(default)  # 默认
         
         button = tk.Button(frame, text=button_text,command=butonn_fun,width=8)
-        button.grid(row=rows, column=2, padx=5, pady=1) 
+        button.grid(row=rows, column=columns+2, padx=5, pady=1) 
 
     def SetParas(self,Num):
         print(f"num={Num.value}")

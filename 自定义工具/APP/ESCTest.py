@@ -539,26 +539,77 @@ class Esc_Test:
         """
         Status_window = tk.Toplevel(self.frame)
         Status_window.title("状态监测")
+        # 移除最小化和最大化按钮，只保留关闭按钮
+        Status_window.attributes('-toolwindow', True)      
+
         # 锁定父窗口
         x, y = self.parent.winfo_pointerxy()  # 获取鼠标的x和y坐标
         Status_window.grab_set()
-        Status_window.geometry(f"100x200+{x}+{y-200}")
+        Status_window.geometry(f"300x220+{x}+{y-200}")
         # 在 Toplevel 窗口中创建一个 Frame
         frame = tk.Frame(Status_window, bg='lightgray')
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # 在 Frame 中添加控件
-        label = tk.Label(frame, text="这是状态监测窗口", bg='lightgray')
-        label.pack(pady=10)
-        
-        close_button = tk.Button(frame, text="Close", command=Status_window.destroy)
-        close_button.pack(pady=10)        
-        # 在新窗口中添加一个标签
+    
 
-        # 可以在新窗口中添加更多的控件
-        # 例如，添加一个按钮
-        # button = tk.Button(Status_window, text="Close", command=Status_window.destroy)
-        # button.pack(pady=10)    
+        #纸将尽
+        self.PaperFinal_canvas = self.Creat_Statu_check(frame,0,"纸将尽侦测")       
+        #打印机堵纸
+        self.PaperJam_canvas = self.Creat_Statu_check(frame,1,"打印机堵纸")   
+        #机芯未连接
+        self.MoveDisconnect_canvas = self.Creat_Statu_check(frame,2,"机芯未连接")  
+        #打印机缺纸
+        self.LackPaper_canvas = self.Creat_Statu_check(frame,3,"打印机缺纸")  
+        #切刀错误
+        self.CutError_canvas = self.Creat_Statu_check(frame,4,"切刀错误")  
+        #打印机过热
+        self.tempHigh_canvas = self.Creat_Statu_check(frame,5,"温度过高")
+        #轴未压下
+        self.OpenLid_canvas = self.Creat_Statu_check(frame,6,"轴未压下")
+        #定位错误
+        self.FixError_canvas = self.Creat_Statu_check(frame,7,"定位错误")
+
+        #固件版本
+        self.FirmVer_entry = self.Creat_PrintID_check(frame,0,"固件版本:")
+        #制造商
+        self.Manufature_entry = self.Creat_PrintID_check(frame,1,"制造商:")
+        #打印机名称
+        self.Printername_entry = self.Creat_PrintID_check(frame,2,"打印机名称:")     
+        #打印机名称
+        self.PrinterId_entry = self.Creat_PrintID_check(frame,3,"ID:")   
+        #编码方式
+        self.Code_entry = self.Creat_PrintID_check(frame,4,"编码方式:")  
+        #循环检测
+        self.Loopcheck_button = tk.Button(frame, text="循环检测",width=8,command=lambda:self.Printer_Status_check(0),font=("仿宋",10,"bold"),bg="green")
+        self.Loopcheck_button.place(x=100,y=150)   
+        #手动检测
+        self.handcheck_button = tk.Button(frame, text="手动检测",width=8,command=lambda:self.Printer_Status_check(1),font=("仿宋",10,"bold"),bg="white")
+        self.handcheck_button.place(x=180,y=150)    
+
+    def Printer_Status_check(self,mode=0):
+        print(f"mode={mode}")#检测动作
+        if mode == 0:
+            self.Loopcheck_button.config(bg="green")  # 修改颜色
+            self.handcheck_button.config(bg="white")  # 修改颜色
+        else :
+            self.Loopcheck_button.config(bg="white")  # 修改颜色
+            self.handcheck_button.config(bg="green")  # 修改颜色
+
+    def Creat_Statu_check(self,frame, _row, _text, initial_color="green"):
+        canvas = tk.Canvas(frame, width=10, height=10, bg='lightgray', highlightthickness=1, highlightbackground='black')
+        rect = canvas.create_rectangle(0, 0, 10, 10, fill=initial_color)  # 初始颜色为绿色
+        canvas.grid(row=_row, column=0, padx=5, pady=(1,0),sticky="w")
+
+        label = tk.Label(frame, text=_text, bg='lightgray')
+        label.grid(row=_row, column=1, padx=5, pady=(1,0),sticky="w")    
+        return canvas  
+    
+    def Creat_PrintID_check(self,frame, _row, _text):
+        label = tk.Label(frame, text=_text, bg='lightgray')
+        label.grid(row=_row, column=2, padx=5, pady=(1,0),sticky="w")   
+
+        entry = tk.Entry(frame, width=13)
+        entry.grid(row=_row, column=3, padx=1, pady=2,sticky="w")
+        return entry
     
     def Send_TextData(self):
         # 获取文本框的数据
