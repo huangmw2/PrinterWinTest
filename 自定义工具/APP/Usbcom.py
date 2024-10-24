@@ -5,6 +5,7 @@ import os
 import serial
 import serial.tools.list_ports
 import logging
+import time
 try:
     from APP.Log import log_message
 except ImportError:
@@ -55,6 +56,9 @@ class Dll_Init:
         self.buffer_usb = ctypes.create_string_buffer(self.buffer_size)
         self.mylib.WriteData.argtypes = [ctypes.POINTER(ctypes.c_ubyte), ctypes.c_size_t, ctypes.c_ulong]
         self.mylib.WriteData.restype = ctypes.c_int
+        #USB写入
+        self.mylib.Read.argtypes = [ctypes.POINTER(ctypes.c_ubyte), ctypes.c_size_t, ctypes.c_ulong]
+        self.mylib.Read.restype = ctypes.c_int
         #串口 的接口
         self.mylib.Port_EnumCOM.argtypes = [ctypes.c_char_p, ctypes.c_size_t]
         self.mylib.Port_EnumCOM.restype = ctypes.c_size_t
@@ -97,6 +101,23 @@ class Dll_Init:
         result = self.mylib.WriteData(buf_ptr, count, timeout)
         return result
     
+    def Read_Usbdata(self,buttf_size=256):
+        buf =  ctypes.create_string_buffer(buttf_size)  # 创建字符串缓冲区
+        count =  buttf_size  # 数据长度
+        timeout = ctypes.c_ulong(5000)  # 超时设置（例如 5000 毫秒）
+        buf_ptr2 = ctypes.cast(buf, ctypes.POINTER(ctypes.c_ubyte))
+        
+        while self.running:
+            # 调用 Read 函数
+            result = self.mylib.Read(buf, count, timeout)
+            time.sleep(0.1)
+            if result > 0:
+                data = buf.raw[:result]  # 只获取有效数据部分
+                print("读取的数据:\n", data)
+            else:
+                print("没有读取到数据")
+            time.sleep(0.5)  # 可根据需要调整读取频率
+    
     def Close_UsbCom(self):
         if not self.Dll_Flag :
             return 0
@@ -121,7 +142,6 @@ class Dll_Init:
         serial_devices = [device.decode('utf-8', errors='replace') for device in serial_devices if device]
         return serial_devices
         
-        pass
     
     def Open_serialCom(self,port, baudrate):
         try:
@@ -195,3 +215,11 @@ if __name__ == "__main__":
         print("没有找到设备")
 
     Comm_class.List_SerialCom()
+    Comm_class.Open_UsbCom()
+    
+    for i in range(10):
+        byte_data = bytes.fromhex("10 04 04 00")
+        Comm_class.Write_Usbdata(byte_data)
+        Comm_class.Read_Usbdata()
+        #time.sleep(0.5)
+    Comm_class.Close_UsbCom()
