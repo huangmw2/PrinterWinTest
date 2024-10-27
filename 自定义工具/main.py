@@ -273,12 +273,15 @@ class MainUI:
         global Global_Comtype  # 引用全局变量
         Comtype = Global_Comtype
         self.read_thread  = queue_handler.start_read_thread(Comtype)
+        #接收队列
+        self.receive_thread  = queue_handler.start_receive_thread(Comtype,self.Esc_test.insert_recetext)
 
     def on_close(self):
         self.root.destroy()
         self.startup_window.deiconify()
         queue_handler.stop_read_thread()
         self.read_thread.join()
+        self.receive_thread.join()
         Data = Rtn_logmessage()
         self.startup_class.log_text.insert(tk.END, Data + '\n')
 

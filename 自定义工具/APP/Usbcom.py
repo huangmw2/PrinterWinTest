@@ -101,23 +101,28 @@ class Dll_Init:
         result = self.mylib.WriteData(buf_ptr, count, timeout)
         return result
     
-    def Read_Usbdata(self,buttf_size=256):
+    def Read_Usbdata(self,buttf_size=1024):
         buf =  ctypes.create_string_buffer(buttf_size)  # 创建字符串缓冲区
-        count =  buttf_size  # 数据长度
-        timeout = ctypes.c_ulong(5000)  # 超时设置（例如 5000 毫秒）
+        count =  ctypes.c_size_t(buttf_size)
+        timeout = ctypes.c_ulong(2)  # 超时设置（例如 5000 毫秒）
         buf_ptr2 = ctypes.cast(buf, ctypes.POINTER(ctypes.c_ubyte))
+        self.mylib.ReadInit()
+        result = self.mylib.ReadData(buf_ptr2, count, timeout)
         
-        while self.running:
-            # 调用 Read 函数
-            result = self.mylib.Read(buf, count, timeout)
-            time.sleep(0.1)
-            if result > 0:
-                data = buf.raw[:result]  # 只获取有效数据部分
-                print("读取的数据:\n", data)
-            else:
-                print("没有读取到数据")
-            time.sleep(0.5)  # 可根据需要调整读取频率
-    
+        data_str = b''
+        if result > 0:
+            data_str = buf.raw[:result]
+            hex_representation = ' '.join(f'{byte:02X}' for byte in data_str)  # 转换为十六进制字符串
+        else:
+            hex_representation = 0xFF
+            log = "没有读取到打印机返回的数据"
+            log_message(log,logging.WARNING)
+
+        return hex_representation
+
+    def Close_ReadUsbData(self):
+        self.mylib.ReadClose()
+
     def Close_UsbCom(self):
         if not self.Dll_Flag :
             return 0
@@ -217,9 +222,7 @@ if __name__ == "__main__":
     Comm_class.List_SerialCom()
     Comm_class.Open_UsbCom()
     
-    for i in range(10):
-        byte_data = bytes.fromhex("10 04 04 00")
-        Comm_class.Write_Usbdata(byte_data)
-        Comm_class.Read_Usbdata()
+
+    Comm_class.Read_Usbdata()
         #time.sleep(0.5)
-    Comm_class.Close_UsbCom()
+    Comm_class.Close_UsbCom()    

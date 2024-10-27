@@ -1,6 +1,7 @@
 #ESC Test.py
 import os
 import re
+import time 
 import tkinter as tk
 from tkinter import ttk,filedialog
 from PIL import Image, ImageTk  # 如果没有安装PIL，可以通过 pip install pillow 安装
@@ -21,6 +22,11 @@ class Esc_Test:
             self.root.title("ESC测试")
             self.root.geometry("700x500+600+300")
         
+       #接收到的数据
+        self.receiveStatus_array = []
+        self.receiveId_array = []
+        self.MonitorFlag = False
+        self.MonitorIDFlag = False
        # self.parent = parent
         self.Image_DefaultPath = "./time.bmp"
         # 创建主框架
@@ -63,10 +69,10 @@ class Esc_Test:
         recv_scrollbar = ttk.Scrollbar(recv_frame)
         recv_scrollbar.grid(row=0, column=1, padx=1, pady=1,sticky='ns')
         # 创建文本框并绑定滚动条
-        recv_text = tk.Text(recv_frame, height=6, width=50, yscrollcommand=recv_scrollbar.set)
-        recv_text.grid(row=0, column=0, padx=1, pady=1)
+        self.recv_text = tk.Text(recv_frame, height=6, width=50, yscrollcommand=recv_scrollbar.set)
+        self.recv_text.grid(row=0, column=0, padx=1, pady=1)
         # 绑定滚动条到文本框
-        recv_scrollbar.config(command=recv_text.yview)
+        recv_scrollbar.config(command=self.recv_text.yview)
         self.Hex_reve_flag = tk.BooleanVar()
         self.Hex_reve_flag.set(True)
         hex_recv_check = tk.Checkbutton(recv_frame, text="十六进制接收",
@@ -77,7 +83,7 @@ class Esc_Test:
                                         font=("仿宋",10))
         hex_recv_check.grid(row=1, column=0, padx=5, pady=5, sticky="w")
 
-        Clear_recv_button = ttk.Button(recv_frame, text="清空接收区", command=lambda: recv_text.delete(1.0, tk.END))
+        Clear_recv_button = ttk.Button(recv_frame, text="清空接收区", command=lambda: self.recv_text.delete(1.0, tk.END))
         Clear_recv_button.grid(row=1, column=0, padx=(120,0), pady=5,sticky="w")
 
         Status_Monitor_button = ttk.Button(recv_frame, text="状态检测", command=self.MonitorStatus)
@@ -543,8 +549,8 @@ class Esc_Test:
         Status_window.attributes('-toolwindow', True)      
 
         # 锁定父窗口
-        x, y = self.parent.winfo_pointerxy()  # 获取鼠标的x和y坐标
         Status_window.grab_set()
+        x, y = self.parent.winfo_pointerxy()  # 获取鼠标的x和y坐标
         Status_window.geometry(f"300x220+{x}+{y-200}")
         # 在 Toplevel 窗口中创建一个 Frame
         frame = tk.Frame(Status_window, bg='lightgray')
@@ -552,56 +558,150 @@ class Esc_Test:
     
 
         #纸将尽
-        self.PaperFinal_canvas = self.Creat_Statu_check(frame,0,"纸将尽侦测")       
+        self.PaperFinal_canvas ,self.PaperFinal_rect_id = self.Creat_Statu_check(frame,0,"纸将尽侦测")       
         #打印机堵纸
-        self.PaperJam_canvas = self.Creat_Statu_check(frame,1,"打印机堵纸")   
+        self.PaperJam_canvas ,self.PaperJam_rect_id = self.Creat_Statu_check(frame,1,"打印机堵纸")   
         #机芯未连接
-        self.MoveDisconnect_canvas = self.Creat_Statu_check(frame,2,"机芯未连接")  
+        self.MoveDisconnect_canvas ,self.MoveDisconnect_rect_id = self.Creat_Statu_check(frame,2,"机芯未连接")  
         #打印机缺纸
-        self.LackPaper_canvas = self.Creat_Statu_check(frame,3,"打印机缺纸")  
+        self.LackPaper_canvas ,self.LackPaper_rect_id = self.Creat_Statu_check(frame,3,"打印机缺纸")  
         #切刀错误
-        self.CutError_canvas = self.Creat_Statu_check(frame,4,"切刀错误")  
+        self.CutError_canvas ,self.CutError_rect_id = self.Creat_Statu_check(frame,4,"切刀错误")  
         #打印机过热
-        self.tempHigh_canvas = self.Creat_Statu_check(frame,5,"温度过高")
+        self.tempHigh_canvas ,self.tempHigh_rect_id = self.Creat_Statu_check(frame,5,"温度过高")
         #轴未压下
-        self.OpenLid_canvas = self.Creat_Statu_check(frame,6,"轴未压下")
+        self.OpenLid_canvas ,self.OpenLid_rect_id = self.Creat_Statu_check(frame,6,"轴未压下")
         #定位错误
-        self.FixError_canvas = self.Creat_Statu_check(frame,7,"定位错误")
+        self.FixError_canvas  ,self.FixError_rect_id = self.Creat_Statu_check(frame,7,"定位错误")
 
+        self.PrinterIdEntry = []
         #固件版本
-        self.FirmVer_entry = self.Creat_PrintID_check(frame,0,"固件版本:")
+        self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,0,"固件版本:"))
         #制造商
-        self.Manufature_entry = self.Creat_PrintID_check(frame,1,"制造商:")
+        self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,1,"制造商:"))
         #打印机名称
-        self.Printername_entry = self.Creat_PrintID_check(frame,2,"打印机名称:")     
+        self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,2,"打印机名称:"))   
         #打印机名称
-        self.PrinterId_entry = self.Creat_PrintID_check(frame,3,"ID:")   
+        self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,3,"ID:"))   
         #编码方式
-        self.Code_entry = self.Creat_PrintID_check(frame,4,"编码方式:")  
+        self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,4,"编码方式:"))  
         #循环检测
         self.Loopcheck_button = tk.Button(frame, text="循环检测",width=8,command=lambda:self.Printer_Status_check(0),font=("仿宋",10,"bold"),bg="green")
-        self.Loopcheck_button.place(x=100,y=150)   
+        self.Loopcheck_button.place(x=100,y=140)   
         #手动检测
         self.handcheck_button = tk.Button(frame, text="手动检测",width=8,command=lambda:self.Printer_Status_check(1),font=("仿宋",10,"bold"),bg="white")
-        self.handcheck_button.place(x=180,y=150)    
+        self.handcheck_button.place(x=180,y=140)    
+        #打印机ID查询
+        self.PrinterId_button = tk.Button(frame, text="打印机ID查询",width=12,command=lambda:self.Printer_Status_check(2),font=("仿宋",10,"bold"),bg="white")
+        self.PrinterId_button.place(x=130,y=170)    
+        # 启动周期性检查函数
+        self.check_status_periodically(Status_window)
+        # 阻塞直到窗口关闭
+        Status_window.wait_window(Status_window)
+        
+    # 修改颜色的函数
+    def change_rectangle_color(self,canvas,rect_id, new_color):
+        canvas.itemconfig(rect_id, fill=new_color)
+
+    def check_status_periodically(self, window):
+        count = 0
+        byte_data = []
+        if self.receiveStatus_array:  # 检查列表是否有数据
+            print(f"self.receiveStatus_array={self.receiveStatus_array}")
+            for hex_string in self.receiveStatus_array:
+                # 将十六进制字符串转换为字节
+                byte_data.append(int(hex_string, 16))
+            #上盖开
+            if byte_data[1] & 0x04:
+                self.change_rectangle_color(self.OpenLid_canvas,self.OpenLid_rect_id, "red")
+            else :
+                self.change_rectangle_color(self.OpenLid_canvas,self.OpenLid_rect_id, "green")
+            #打印机缺纸 
+            if byte_data[1] & 0x20:
+                self.change_rectangle_color(self.LackPaper_canvas,self.LackPaper_rect_id, "red")
+            else :
+                self.change_rectangle_color(self.LackPaper_canvas,self.LackPaper_rect_id, "green")
+            #切刀错误
+            if byte_data[2] & 0x08:
+                self.change_rectangle_color(self.CutError_canvas,self.CutError_rect_id, "red")
+            else :
+                self.change_rectangle_color(self.CutError_canvas,self.CutError_rect_id, "green")
+            #打印机温度过高
+            if byte_data[2] & 0x40:
+                self.change_rectangle_color(self.tempHigh_canvas,self.tempHigh_rect_id, "red")
+            else :
+                self.change_rectangle_color(self.tempHigh_canvas,self.tempHigh_rect_id, "green")
+            #纸将尽
+            if byte_data[3] & 0x0C or byte_data[3] & 0x60:
+                self.change_rectangle_color(self.PaperFinal_canvas,self.PaperFinal_rect_id, "red")
+            else :
+                self.change_rectangle_color(self.PaperFinal_canvas,self.PaperFinal_rect_id, "green")
+
+        if self.receiveId_array:
+            for hex_string in self.receiveId_array:
+                # 将十六进制字符串转换为字节
+                byte_data = bytes.fromhex(hex_string)
+                # 转换为字符串
+                string_data = byte_data.decode('utf-8', errors='ignore')  # 使用 'ignore' 来避免解码错误
+                self.PrinterIdEntry[count].delete(0, tk.END)
+                self.PrinterIdEntry[count].insert(0,string_data)
+                count+=1
+
+            if len(self.receiveId_array) >= 5:
+                self.receiveId_array.clear()     
+                self.MonitorIDFlag = False   
+
+        window.after(1000, self.check_status_periodically, window)
+
+    def Send_StatusCheck(self,mode):
+        if mode == 0:
+            self.receiveStatus_array.clear()
+            byte_data = bytes.fromhex("10 04 01 00 10 04 02 00 10 04 03 00 10 04 04 00")
+            queue_handler.write_to_queue(byte_data,"打印机状态查询")
+        elif mode == 1:
+            self.receiveStatus_array.clear()
+            self.receiveId_array.clear()
+            byte_data = bytes.fromhex("1D 49 41")
+            queue_handler.write_to_queue(byte_data,"打印机ID查询1")
+            byte_data = bytes.fromhex("1D 49 42")
+            queue_handler.write_to_queue(byte_data,"打印机ID查询2")
+            byte_data = bytes.fromhex("1D 49 43")
+            queue_handler.write_to_queue(byte_data,"打印机ID查询3")
+            byte_data = bytes.fromhex("1D 49 44")
+            queue_handler.write_to_queue(byte_data,"打印机ID查询4")
+            byte_data = bytes.fromhex("1D 49 45")
+            queue_handler.write_to_queue(byte_data,"打印机ID查询5")
 
     def Printer_Status_check(self,mode=0):
-        print(f"mode={mode}")#检测动作
+        if self.MonitorFlag==False:
+            self.MonitorFlag = True
+            self.MonitorIDFlag = False
         if mode == 0:
             self.Loopcheck_button.config(bg="green")  # 修改颜色
             self.handcheck_button.config(bg="white")  # 修改颜色
-        else :
+            self.PrinterId_button.config(bg="white")
+            self.Send_StatusCheck(0)
+        elif mode == 1:
             self.Loopcheck_button.config(bg="white")  # 修改颜色
             self.handcheck_button.config(bg="green")  # 修改颜色
+            self.PrinterId_button.config(bg="white")
+            self.Send_StatusCheck(0)
+        else :
+            self.Loopcheck_button.config(bg="white")  # 修改颜色
+            self.handcheck_button.config(bg="white")  # 修改颜色
+            self.PrinterId_button.config(bg="green")  # 修改颜色
+            self.MonitorFlag = False
+            self.MonitorIDFlag = True
+            self.Send_StatusCheck(1)
 
     def Creat_Statu_check(self,frame, _row, _text, initial_color="green"):
         canvas = tk.Canvas(frame, width=10, height=10, bg='lightgray', highlightthickness=1, highlightbackground='black')
-        rect = canvas.create_rectangle(0, 0, 10, 10, fill=initial_color)  # 初始颜色为绿色
+        rect_id = canvas.create_rectangle(0, 0, 10, 10, fill=initial_color)  # 初始颜色为绿色
         canvas.grid(row=_row, column=0, padx=5, pady=(1,0),sticky="w")
 
         label = tk.Label(frame, text=_text, bg='lightgray')
         label.grid(row=_row, column=1, padx=5, pady=(1,0),sticky="w")    
-        return canvas  
+        return canvas ,rect_id
     
     def Creat_PrintID_check(self,frame, _row, _text):
         label = tk.Label(frame, text=_text, bg='lightgray')
@@ -640,6 +740,14 @@ class Esc_Test:
                 widget.config(state='normal')           
             self.Add_SerialNum()
 
+    #向接收区插入数据
+    def insert_recetext(self,data):
+        self.recv_text.insert(tk.END, f"{data}\n")  # 更新文本框
+        self.recv_text.see(tk.END)  # 滚动到最后一行
+        if self.MonitorFlag:
+            self.receiveStatus_array.append(data)
+        if self.MonitorIDFlag:
+            self.receiveId_array.append(data)
     def Hex_model(self):
         pass
     def open_file(self):
