@@ -3,7 +3,7 @@ import os
 import re
 import time 
 import tkinter as tk
-from tkinter import ttk,filedialog
+from tkinter import ttk,filedialog,messagebox
 from PIL import Image, ImageTk  # 如果没有安装PIL，可以通过 pip install pillow 安装
 if __name__ == "__main__":
     from Queue import queue_handler
@@ -315,9 +315,9 @@ class Esc_Test:
         self.ImageSize_label = tk.Label(self.frame, text="图片大小:",font=("仿宋",10))
         self.ImageSize_label.place(x=400,y=440)
 
-        self.ImageSize_entry = ttk.Combobox(self.frame, width=8, values=['384','576','864','1224'])
+        self.ImageSize_entry = ttk.Combobox(self.frame, width=8, values=['192','384','576','832'])
         self.ImageSize_entry.place(x=480,y=440)
-        self.ImageSize_entry.set('576')
+        self.ImageSize_entry.set('384')
 
         self.ImagePrn_button = tk.Button(self.frame, text="打印",width=8,command=self.Image_Prn,font=("仿宋",10,"bold"))
         self.ImagePrn_button.place(x=600,y=440)
@@ -351,7 +351,9 @@ class Esc_Test:
         self.BarcodeData_entry.insert(0, default_value)
 
     def Image_Prn(self):
-        pass
+        FilePath = self.Image_entry.get()
+        image_size = int(self.ImageSize_entry.get())
+        ret = queue_handler.Print_Image(FilePath,image_size)
     def Open_ImagePath(self):
         FilePath = filedialog.askopenfilename(title="选择图片路径",filetypes=[("Image Files","*.png;*.jpg;*.jpeg;*.bmp;")])
         if FilePath:
@@ -370,7 +372,20 @@ class Esc_Test:
             '纠错等级3': "3",
             '纠错等级4': "4 ",
         }
+        QrCode_Init = "1d 77 "
+        QrCode_width = QrCodeWidth.zfill(2) +  " "
+        QrCode_PrintDat = "1D 6B 61 "
+        QrCode_Size = QrcodeSize.zfill(2) +  " "
         Codelevel = Qrcodelevels.get(Qrcodelevel, "2")
+        Qrcode_level = Codelevel
+
+        Qrcode_Datlen = len(QrCodeData)
+        Qrcode_data = QrCodeData.encode('utf-8') 
+        Qrcode_data_hex =  ' '.join(format(byte, '02x') for byte in Qrcode_data)
+
+        Send_pack = QrCode_Init+QrCode_width+QrCode_PrintDat+QrCode_Size+Qrcode_level+Qrcode_data_hex
+        print(f"Sendpack = {Send_pack}")
+
         queue_handler.Print_QRCode(QrCodeData,int(QrCodeWidth),int(QrcodeSize),int(Codelevel))
 
     def Barcode_Prn(self):
@@ -585,6 +600,8 @@ class Esc_Test:
         self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,3,"ID:"))   
         #编码方式
         self.PrinterIdEntry.append(self.Creat_PrintID_check(frame,4,"编码方式:"))  
+        for num in self.PrinterIdEntry:
+            num.delete(0, tk.END)
         #循环检测
         self.Loopcheck_button = tk.Button(frame, text="循环检测",width=8,command=lambda:self.Printer_Status_check(0),font=("仿宋",10,"bold"),bg="green")
         self.Loopcheck_button.place(x=100,y=140)   
@@ -605,9 +622,8 @@ class Esc_Test:
 
     def check_status_periodically(self, window):
         count = 0
-        byte_data = []
+        byte_data = [0x00,0x00,0x00,0x00]
         if self.receiveStatus_array:  # 检查列表是否有数据
-            print(f"self.receiveStatus_array={self.receiveStatus_array}")
             for hex_string in self.receiveStatus_array:
                 # 将十六进制字符串转换为字节
                 byte_data.append(int(hex_string, 16))
@@ -715,9 +731,18 @@ class Esc_Test:
         # 获取文本框的数据
         text_data = self.send_text.get("1.0", tk.END)  # 从第一行第一列到最后
         hex_flag = self.Hex_send_flag.get()
+        hex_data = re.findall(r'[0-9A-Fa-f]+', text_data)
+        # 过滤掉只有一个十六进制字符的项
+        hex_data = [item for item in hex_data if len(item) == 2]
+        # 将过滤后的数据合并为一个字符串
+        filtered_text = ''.join(hex_data)
+
         if hex_flag :
-            byte_data = bytes.fromhex(text_data)
-            queue_handler.write_to_queue(byte_data,"发送文本框数据(16进制)")   
+            try :
+                byte_data = bytes.fromhex(filtered_text)
+                queue_handler.write_to_queue(byte_data,"发送文本框数据(16进制)")   
+            except ValueError as e:
+                messagebox.showerror("错误", f"文本框数据有错\n错误信息: {e}")
         else :
              queue_handler.write_to_queue(text_data,"发送文本框数据(非16进制)")        
     def Add_SerialNum(self):
@@ -742,7 +767,16 @@ class Esc_Test:
 
     #向接收区插入数据
     def insert_recetext(self,data):
-        self.recv_text.insert(tk.END, f"{data}\n")  # 更新文本框
+        if self.Hex_reve_flag.get() == False:
+            # 去掉空格
+            hex_string = data.replace(" ", "")
+            # 将十六进制字符串转换为字节
+            byte_data = bytes.fromhex(hex_string)
+            # 解码为普通字符串
+            normal_string = byte_data.decode('utf-8')
+        else :
+            normal_string = data 
+        self.recv_text.insert(tk.END, f"{normal_string}\n")  # 更新文本框
         self.recv_text.see(tk.END)  # 滚动到最后一行
         if self.MonitorFlag:
             self.receiveStatus_array.append(data)
@@ -752,13 +786,8 @@ class Esc_Test:
         pass
     def open_file(self):
         pass
-    def save_file(self):
-        pass
     def send_data():
         # 处理发送数据的逻辑
-        pass
-    def connect_port():
-        # 处理连接端口的逻辑
         pass
 
 if __name__ == "__main__":

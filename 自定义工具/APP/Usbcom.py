@@ -66,6 +66,9 @@ class Dll_Init:
         #打印二维码
         self.mylib.Pos_Qrcode.argtypes = [ctypes.c_wchar_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
         self.mylib.Pos_Qrcode.restype = ctypes.c_bool
+        #打印图片
+        self.mylib.Pos_ImagePrint.argtypes = [ctypes.c_wchar_p, ctypes.c_int, ctypes.c_int]
+        self.mylib.Pos_ImagePrint.restype = ctypes.c_bool       
     #列出USB接口
     def List_UsbCom(self):
         if not self.Dll_Flag :
@@ -200,6 +203,10 @@ class Dll_Init:
     #打印二位码
     def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4):
         ret = self.mylib.Pos_Qrcode(QrcodeData,nWidth,nVersion,nErrlevenl)
+        return ret
+    
+    def Print_Image(self,Image_path,nWidth = 384,nBinaryAlgorithm=0):
+        ret = self.mylib.Pos_ImagePrint(Image_path,nWidth,nBinaryAlgorithm)
         return ret
     #打印12.5%票据速度
     def Print_SpeedData(self,Data,ComType):

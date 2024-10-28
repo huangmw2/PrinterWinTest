@@ -94,6 +94,17 @@ class QueueHandlder:
         ret = Comm_class.Print_QRCode(QrcodeData,nWidth,nVersion,nErrlevenl)
         return ret
     
+    def Print_Image(self,Imagepath,nWidth = 384,nBinaryAlgorithm=0):
+        log = "发送打印图片任务：Path:{}",format(Imagepath)
+        log_message(log,logging.DEBUG)
+        ret = Comm_class.Print_Image(Imagepath,nWidth,nBinaryAlgorithm)
+        if ret:
+            log = "任务成功"
+        else :
+            log = "任务失败"
+        log_message(log,logging.DEBUG)
+        return ret
+            
     def start_read_thread(self,comtype):
         log = "新增一个读队列线程："
         log_message(log,logging.DEBUG)
