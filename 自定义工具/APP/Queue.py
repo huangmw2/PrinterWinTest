@@ -29,10 +29,12 @@ class QueueHandlder:
             log_message("队列任务以满，请稍后在写入",logging.INFO)
 
     def receive_queue(self,comtype,update_callback=None):
+        ret_data = 0XFF
         while self.Rrunning:
             if comtype == "USB":
                 ret_data = Comm_class.Read_Usbdata()
-
+            elif comtype == "串口":
+                ret_data = 0XFF
             if not self.read_queue.full() and ret_data != 0xFF:
                 self.read_queue.put(ret_data)
                 update_callback(ret_data)
@@ -90,8 +92,16 @@ class QueueHandlder:
             print("Other Com")
             pass
 
-    def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4):
-        ret = Comm_class.Print_QRCode(QrcodeData,nWidth,nVersion,nErrlevenl)
+    def Print_QRCode(self,QrcodeData,nWidth = 2,nVersion = 0,nErrlevenl = 4,Databytes=0):
+        global Queue_Comtype
+        ret = False
+        if Queue_Comtype == "USB":
+            ret = Comm_class.Print_QRCode(QrcodeData,nWidth,nVersion,nErrlevenl)
+        elif Queue_Comtype == "串口":
+            ret = self.Send_data(Queue_Comtype,Databytes)
+        else :
+            pass
+        
         return ret
     
     def Print_Image(self,Imagepath,nWidth = 384,nBinaryAlgorithm=0):
@@ -113,20 +123,23 @@ class QueueHandlder:
         return read_thread
     
     def start_receive_thread(self,comtype,update_callback):
-        log = "新增一个接收数据的线程队列："
-        log_message(log,logging.DEBUG)
-        read_thread = threading.Thread(target=self.receive_queue,args=(comtype,update_callback))
-        read_thread.start()
-        return read_thread
+        if comtype == "USB":
+            log = "新增一个接收数据的线程队列："
+            log_message(log,logging.DEBUG)
+            read_thread = threading.Thread(target=self.receive_queue,args=(comtype,update_callback))
+            read_thread.start()
+            return read_thread
            
     def stop_read_thread(self):
+        global Queue_Comtype
         self.running = False
         log = "关闭读队列线程"
         log_message(log,logging.DEBUG)
-        self.Rrunning = False
-        log = "关闭接收队列线程"
-        log_message(log,logging.DEBUG)
-        Comm_class.Close_ReadUsbData()
+        if Queue_Comtype == "USB":
+            self.Rrunning = False
+            log = "关闭接收队列线程"
+            log_message(log,logging.DEBUG)
+            Comm_class.Close_ReadUsbData()
 
 queue_handler = QueueHandlder()
 

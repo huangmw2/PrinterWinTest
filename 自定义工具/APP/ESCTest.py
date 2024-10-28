@@ -2,6 +2,7 @@
 import os
 import re
 import time 
+import struct
 import tkinter as tk
 from tkinter import ttk,filedialog,messagebox
 from PIL import Image, ImageTk  # 如果没有安装PIL，可以通过 pip install pillow 安装
@@ -370,23 +371,28 @@ class Esc_Test:
             '纠错等级1': "1",
             '纠错等级2': "2",
             '纠错等级3': "3",
-            '纠错等级4': "4 ",
+            '纠错等级4': "4",
         }
         QrCode_Init = "1d 77 "
         QrCode_width = QrCodeWidth.zfill(2) +  " "
         QrCode_PrintDat = "1D 6B 61 "
-        QrCode_Size = QrcodeSize.zfill(2) +  " "
+        QrCode_Size = int(QrcodeSize) 
+        QrCode_Size = hex(QrCode_Size) 
+        QrCode_Size = QrCode_Size.upper()[2:].zfill(2) +  " "
         Codelevel = Qrcodelevels.get(Qrcodelevel, "2")
-        Qrcode_level = Codelevel
+        Qrcode_level = Codelevel.zfill(2) + " "
 
-        Qrcode_Datlen = len(QrCodeData)
+        little_endian_bytes = struct.pack('<H', len(QrCodeData))  # '<H' 表示小端格式的无符号短整数
+        Qrcode_lenhex = little_endian_bytes.hex().upper()  # 转换为16进制字符串并转为大写
+        formatted_str = ' '.join([Qrcode_lenhex[i:i+2] for i in range(0, len(Qrcode_lenhex), 2)])
+        Qrcode_Datlen = formatted_str + " "
         Qrcode_data = QrCodeData.encode('utf-8') 
         Qrcode_data_hex =  ' '.join(format(byte, '02x') for byte in Qrcode_data)
 
-        Send_pack = QrCode_Init+QrCode_width+QrCode_PrintDat+QrCode_Size+Qrcode_level+Qrcode_data_hex
+        Send_pack = QrCode_Init+QrCode_width+QrCode_PrintDat+QrCode_Size+Qrcode_level+Qrcode_Datlen+Qrcode_data_hex
         print(f"Sendpack = {Send_pack}")
-
-        queue_handler.Print_QRCode(QrCodeData,int(QrCodeWidth),int(QrcodeSize),int(Codelevel))
+        Qrcode_bytes_Data = bytes.fromhex(Send_pack)
+        queue_handler.Print_QRCode(QrCodeData,int(QrCodeWidth),int(QrcodeSize),int(Codelevel),Qrcode_bytes_Data)
 
     def Barcode_Prn(self):
         #条形码的宽度
@@ -732,11 +738,10 @@ class Esc_Test:
         text_data = self.send_text.get("1.0", tk.END)  # 从第一行第一列到最后
         hex_flag = self.Hex_send_flag.get()
         hex_data = re.findall(r'[0-9A-Fa-f]+', text_data)
-        # 过滤掉只有一个十六进制字符的项
-        hex_data = [item for item in hex_data if len(item) == 2]
-        # 将过滤后的数据合并为一个字符串
-        filtered_text = ''.join(hex_data)
 
+        new_hex_data = [item for item in hex_data if len(item) > 1]
+        # 将过滤后的数据合并为一个字符串
+        filtered_text = ''.join(new_hex_data)
         if hex_flag :
             try :
                 byte_data = bytes.fromhex(filtered_text)
@@ -744,7 +749,8 @@ class Esc_Test:
             except ValueError as e:
                 messagebox.showerror("错误", f"文本框数据有错\n错误信息: {e}")
         else :
-             queue_handler.write_to_queue(text_data,"发送文本框数据(非16进制)")        
+             queue_handler.write_to_queue(text_data,"发送文本框数据(非16进制)")    
+
     def Add_SerialNum(self):
         ret = self.Serial_num.get()
         if not ret :
