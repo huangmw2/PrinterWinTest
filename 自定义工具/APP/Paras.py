@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from enum import Enum
-
+import struct
 
 class button_fun(Enum):
     BAUD_RATE_FUN = 0
@@ -20,6 +20,17 @@ class button_fun(Enum):
     BLACK_FIND_FUN = 12
     BLACK_FINDCUT_FUN = 13
     BLACK_PRINTTEST_FUN =14
+    USB_INTERFACE_TYPE = 15
+    PAPER_TYPE = 16
+    PRINTER_ORDER = 17
+    RECYCLE_TIME = 18
+    PAPER_RULES = 19
+    DESITY_LEVEL= 20
+    FEED_PAPER_SWITCH = 21
+    PRINTER_PROTOCOL = 22
+    PAPER_JAM_SWITCH = 23
+    PRINTER_SPEED = 24
+    DEVICE_NAME = 25
 
 class Paras_Set:
     def __init__(self,parent):
@@ -30,7 +41,7 @@ class Paras_Set:
             self.root.title("参数设置")
             self.root.geometry("700x500+600+300")    
 
-        self.baud_rate_value = ["9600", "19200", "38400", "57600", "115200","230400"]
+        self.baud_rate_value = ["1200","2400","4800","9600", "19200", "38400", "57600", "115200","230400"]
         self.flow_control_value = ["硬件流控", "软件流控"]
         self.language_entry_value = [
             "CP932 SHIFT JIS", "UNICODE UCS-2", "CP950:BIG5", "CP936:GBK",
@@ -186,34 +197,34 @@ class Paras_Set:
 
         #USB 接口类型
         self.USBType = ["打印口","虚拟串口"]
-        self.create_label_Combobox_button(self.product_frame,0,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(15))
+        self.create_label_Combobox_button(self.product_frame,0,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(button_fun.USB_INTERFACE_TYPE))
         #纸张类型
         self.PaperType = ["热敏票据纸","热敏标签纸","热敏孔洞纸","热敏黑标纸"]
-        self.create_label_Combobox_button(self.product_frame,1,0,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(16))
+        self.create_label_Combobox_button(self.product_frame,1,0,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(button_fun.PAPER_TYPE))
         #打印顺序
         self.PrintOrder = ["倒叙","正序"]
-        self.create_label_Combobox_button(self.product_frame,2,0,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(17))
+        self.create_label_Combobox_button(self.product_frame,2,0,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(button_fun.PRINTER_ORDER))
         #票据回收时间
         self.RecytingTime = ["2","5","10","15","20","30","60"]
-        self.create_label_Combobox_button(self.product_frame,3,0,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(18))
+        self.create_label_Combobox_button(self.product_frame,3,0,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(button_fun.RECYCLE_TIME))
         #纸张规则
         self.PaperFormat = ["1寸","2寸","3寸","4寸"]
-        self.create_label_Combobox_button(self.product_frame,4,0,"纸张规则",self.PaperFormat,self.PaperFormat[2],"设置",lambda:self.SetParas(19))
+        self.create_label_Combobox_button(self.product_frame,4,0,"纸张规则",self.PaperFormat,self.PaperFormat[2],"设置",lambda:self.SetParas(button_fun.PAPER_RULES))
         #浓度等级
         self.Desitylevel = ["浓度等级1","浓度等级2","浓度等级3","浓度等级4","浓度等级5","浓度等级6","浓度等级7","浓度等级8"]
-        self.create_label_Combobox_button(self.product_frame,0,3,"浓度等级",self.Desitylevel,self.Desitylevel[3],"设置",lambda:self.SetParas(20))
+        self.create_label_Combobox_button(self.product_frame,0,3,"浓度等级",self.Desitylevel,self.Desitylevel[3],"设置",lambda:self.SetParas(button_fun.DESITY_LEVEL))
         #走纸键
         self.FeedPaperKey = ["关闭","开启"]
-        self.create_label_Combobox_button(self.product_frame,1,3,"走纸键",self.FeedPaperKey,self.FeedPaperKey[0],"设置",lambda:self.SetParas(21))
+        self.create_label_Combobox_button(self.product_frame,1,3,"走纸键",self.FeedPaperKey,self.FeedPaperKey[0],"设置",lambda:self.SetParas(button_fun.FEED_PAPER_SWITCH))
         #打印机协议
         self.PrintProcotol = ["ESC","TSPL","CPCL"]
-        self.create_label_Combobox_button(self.product_frame,2,3,"打印机协议",self.PrintProcotol,self.PrintProcotol[0],"设置",lambda:self.SetParas(22))
+        self.create_label_Combobox_button(self.product_frame,2,3,"打印机协议",self.PrintProcotol,self.PrintProcotol[0],"设置",lambda:self.SetParas(button_fun.PRINTER_PROTOCOL))
         #堵纸侦测
         self.PaperJam = ["关闭","开启"]
-        self.create_label_Combobox_button(self.product_frame,3,3,"堵纸侦测",self.PaperJam,self.PaperJam[0],"设置",lambda:self.SetParas(23))   
+        self.create_label_Combobox_button(self.product_frame,3,3,"堵纸侦测",self.PaperJam,self.PaperJam[0],"设置",lambda:self.SetParas(button_fun.PAPER_JAM_SWITCH))   
         #打印速度
         self.PrintSpeed = ["1","2","3","4","5","6","7","8"]
-        self.create_label_Combobox_button(self.product_frame,4,3,"打印速度",self.PrintSpeed,self.PrintSpeed[0],"设置",lambda:self.SetParas(24))     
+        self.create_label_Combobox_button(self.product_frame,4,3,"打印速度",self.PrintSpeed,self.PrintSpeed[0],"设置",lambda:self.SetParas(button_fun.PRINTER_SPEED))     
 
         #设备名称
         self.devicename_frame = ttk.LabelFrame(self.frame, text="设备名称",width=150,height=175)
@@ -232,7 +243,7 @@ class Paras_Set:
         self.decicenum_lentry = tk.Entry(self.devicename_frame, width=18)
         self.decicenum_lentry.grid(row=4, column=0, padx=1, pady=2,sticky="w")
 
-        self.deveice_button = tk.Button(self.devicename_frame, text="设置",command=lambda:self.SetParas(25),width=12)
+        self.deveice_button = tk.Button(self.devicename_frame, text="设置",command=lambda:self.SetParas(button_fun.DEVICE_NAME),width=12)
         self.deveice_button .grid(row=5, column=0, padx=1, pady=5) 
 
         #log区
@@ -276,8 +287,188 @@ class Paras_Set:
         button = tk.Button(frame, text=button_text,command=butonn_fun,width=8)
         button.grid(row=rows, column=columns+2, padx=5, pady=1) 
 
+    #Data Packet 发送的数据包 (组包)
+    def Send_Packaging(self,_Command,_Paramh,_Paraml,Data=None):
+        #包头 + 起始标志位
+        Start_flag = b'\x02\x00'
+        #命令,2字节，小端
+        Command = struct.pack('<H', _Command) #小端格式的命令
+        #命令参数，高字节
+        Param_h = _Paramh
+        #命令参数，低字节
+        Param_l = _Paraml
+        #设备ID值
+        Device_Id = b'\x00\x00\x00\x00'
+        #数据长度
+        if Data != None:
+            _Data_length = len(Data)
+            Data_length = struct.pack('<H', _Data_length)  # 小端格式的数据长度
+        else :
+            Data_length = b'\x00\x00'
+        #计算校验和
+        CheckSum = Start_flag[0] ^ Start_flag[1] ^ Command[0] ^ Command[1]
+        CheckSum ^= Param_h[0] ^ Param_h[1] ^ Param_l[0] ^ Param_l[1]
+        CheckSum ^= Device_Id[0] ^ Device_Id[1] ^ Device_Id[0] ^ Device_Id[1]
+        CheckSum ^= Data_length[0] ^ Data_length[1]
+        #预留位
+        Reserved = b'\00'
+        #数据校验和
+        if Data != None:
+            Data_CheckSum = 0
+            for byte in Data:
+                Data_CheckSum ^= byte   
+            Packet = Start_flag + Command + Param_h + Param_l + Device_Id + Data_length + bytes([CheckSum]) + Reserved + Data + bytes([Data_CheckSum])
+        else :
+            Packet = Start_flag + Command + Param_h + Param_l + Device_Id + Data_length + bytes([CheckSum]) + Reserved
+        #数据包
+        packet_str = ' '.join(f'{byte:02x}' for byte in Packet)
+        print(f"Packet={packet_str}")
+    #连通数据
+    def Connect_testing(self):
+        Command = 0x30
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Data = [0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80]
+        Data = bytes(Data)
+        return Command,Paramh,Paraml,Data
+    #波特率设置数据
+    def BaudRate_set(self):
+        ChangeData = {
+            '1200': "05",
+            '2400': "06",
+            '4800': "07",
+            '9600': "00",
+            '19200': "01",
+            '38400': "02",
+            '57600': "03",
+            '115200': "04", 
+            '230400': "08",          
+        }
+        Command = 0x81
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_BaudRate = self.baud_rate.get()
+        New_BaudRate = ChangeData.get(Old_BaudRate, "00")
+        Data = bytes.fromhex(New_BaudRate)
+        return Command,Paramh,Paraml,Data
+    #流控设置
+    def Flow_set(self):
+        ChangeData = {
+            '硬件流控': "01",
+            '软件流控': "00",         
+        }
+        Command = 0x8d
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.flow_control.get()
+        New_Data = ChangeData.get(Old_Data, "00")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data
+    #语言设置
+    def Language_set(self):
+        ChangeData = {
+            '硬件流控': "01",
+            '软件流控': "00",         
+        }
+        Command = 0x8d
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.flow_control.get()
+        New_Data = ChangeData.get(Old_Data, "00")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data      
+    #集合参数1设置
+    def Part1_set(self):
+        ChangeData1 = {
+            '9x17': "00",
+            '12x24': "40",         
+            '9x24': "08",
+            '16x18': "48",   
+        }
+        ChangeData2 = {
+            '微淡': "00",
+            '正常': "80",         
+            '微浓': "01",
+            '高浓': "81",   
+        }
+        ChangeData3 = {
+            '0x0A': "00",
+            '0x0D': "01",              
+        }
+        ChangeData4 = {
+            '不切': "00",
+            '最后一张切': "01", 
+            '指令切': "02", 
+            '单张切': "03",              
+        }
+        
+        
+        Command = 0x82
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        #字体
+        Temp = self.font_size.get()
+        Temp = ChangeData1.get(Temp, "40")
+        Temp = int(Temp,16)
+        Old_Data1 = Temp
+        #浓度
+        Temp = self.print_density.get()
+        Temp = ChangeData2.get(Temp, "80")
+        Temp = int(Temp,16)
+        Old_Data1 += Temp
+        #切刀
+        if self.buzzer_var.get():
+            Old_Data1 += 0x04
+        #蜂鸣器
+        if self.knife_var.get():
+            Old_Data1 += 0x20
+        New_Data1 = Old_Data1.to_bytes(1, byteorder='little')
+
+
+        Old_Data2 = self.paper_feed.get()
+        New_Data2 = ChangeData3.get(Old_Data2, "00")
+        New_Data2 = bytes.fromhex(New_Data2)
+
+        Old_Data3 = self.cutter_type.get()
+        New_Data3 = ChangeData4.get(Old_Data3, "00")
+        New_Data3 = bytes.fromhex(New_Data3)
+
+        Data = New_Data1 + New_Data2 + New_Data3
+        return Command,Paramh,Paraml,Data  
+    #休眠时间设置
+    def Sleep_set(self):
+       
+        Command = 0x86
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+
+        sleep_time = int(self.sleep_entry.get())
+        sleep_time = sleep_time.to_bytes(4, byteorder='little')
+
+        shut_time = int(self.shutdown_entry.get())
+        shut_time = shut_time.to_bytes(4, byteorder='little')
+
+        Data = sleep_time + shut_time
+        return Command,Paramh,Paraml,Data
+    #设置全部参数
+    def All_Set(self):
+        pass
+    #恢复出场设置
+    def Reset_set(self):
+        Command = 0x79
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Data = None
+        return Command,Paramh,Paraml,Data
+    
     def SetParas(self,Num):
-        print(f"num={Num.value}")
+        Command = 0x00
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Data   = []
+        Command,Paramh,Paraml,Data = self.Reset_set()
+        self.Send_Packaging(Command,Paramh,Paraml,Data)
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = Paras_Set(root)
