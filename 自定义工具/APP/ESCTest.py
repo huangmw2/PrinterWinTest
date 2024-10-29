@@ -632,7 +632,8 @@ class Esc_Test:
         if self.receiveStatus_array:  # 检查列表是否有数据
             for hex_string in self.receiveStatus_array:
                 # 将十六进制字符串转换为字节
-                byte_data.append(int(hex_string, 16))
+                byte_data[count] =int(hex_string, 16)
+                count += 1
             #上盖开
             if byte_data[1] & 0x04:
                 self.change_rectangle_color(self.OpenLid_canvas,self.OpenLid_rect_id, "red")
@@ -660,7 +661,8 @@ class Esc_Test:
                 self.change_rectangle_color(self.PaperFinal_canvas,self.PaperFinal_rect_id, "green")
 
         if self.receiveId_array:
-            for hex_string in self.receiveId_array:
+            ReceiveId_Array = self.receiveId_array
+            for hex_string in ReceiveId_Array:
                 # 将十六进制字符串转换为字节
                 byte_data = bytes.fromhex(hex_string)
                 # 转换为字符串
@@ -678,8 +680,14 @@ class Esc_Test:
     def Send_StatusCheck(self,mode):
         if mode == 0:
             self.receiveStatus_array.clear()
-            byte_data = bytes.fromhex("10 04 01 00 10 04 02 00 10 04 03 00 10 04 04 00")
-            queue_handler.write_to_queue(byte_data,"打印机状态查询")
+            byte_data = bytes.fromhex("10 04 01")
+            queue_handler.write_to_queue(byte_data,"打印机状态查询1")
+            byte_data = bytes.fromhex("10 04 02")
+            queue_handler.write_to_queue(byte_data,"打印机状态查询2")
+            byte_data = bytes.fromhex("10 04 03")
+            queue_handler.write_to_queue(byte_data,"打印机状态查询3")
+            byte_data = bytes.fromhex("10 04 04")
+            queue_handler.write_to_queue(byte_data,"打印机状态查询4")
         elif mode == 1:
             self.receiveStatus_array.clear()
             self.receiveId_array.clear()

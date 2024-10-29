@@ -196,6 +196,20 @@ class Dll_Init:
             log = "关闭串口"
             log_message(log,logging.DEBUG)
             self.ser.close()
+    #网口通信
+
+    #打开网口
+    def Open_EthernetTcp(self):
+        pass
+    #网口写入数据
+    def Write_EthernetTcp(self):
+        pass
+    #网口读取数据
+    def Read_EthernetTcp(self):
+        pass
+    #网口关闭
+    def Close_EthernetTcp(self):
+        pass
 
     def Print_selfTest(self):
         ret = self.mylib.Pos_SelfTest()

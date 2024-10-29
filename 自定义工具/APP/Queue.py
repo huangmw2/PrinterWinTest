@@ -33,6 +33,8 @@ class QueueHandlder:
         while self.Rrunning:
             if comtype == "USB":
                 ret_data = Comm_class.Read_Usbdata()
+                if ret_data == 0XFF:
+                    break
             elif comtype == "串口":
                 ret_data = 0XFF
             if not self.read_queue.full() and ret_data != 0xFF:
