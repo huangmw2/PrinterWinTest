@@ -54,9 +54,9 @@ class Paras_Set:
             "CP737:Greek", "CP1257:Baltic", "Thai", "CP720:Arabic", "CP855:Cyrillic", 
             "CP857:Turkish", "CP1250:Central Europe", "CP775:Estonian/Lithuanian/Latvian", 
             "CP1254:Turkish", "CP1255:Hebrew", "CP1256:Arabic", "CP1258:Vietnam", 
-            "ISO-8859-2:Latin2", "ISO-8859-3:Latin3", "ISO-8859-6:Arabic", "ISO-8859-7:Greek", 
-            "ISO-8859-8:Hebrew", "ISO-8859-9:Turkish", "ISO-8859-15:Latin3", "Thai2", 
-            "CP856:Hebrew", "CP874:Thai", "EUC-KR", "UTF-8"
+            "ISO-8859-2:Latin2", "ISO-8859-3:Latin3", "ISO-8859-4:Baltic","ISO-8859-5:Cyrillic",
+            "ISO-8859-6:Arabic", "ISO-8859-7:Greek", "ISO-8859-8:Hebrew", "ISO-8859-9:Turkish", 
+            "ISO-8859-15:Latin3", "Thai2", "CP856:Hebrew", "CP874:Thai", "EUC-KR", "UTF-8"
         ]
         self.font_size_value = ["9x17","12x24", "9x24", "16x18"]
         self.print_density_value = ["微淡", "正常", "微浓", "高浓"]
@@ -88,9 +88,9 @@ class Paras_Set:
         self.languge_label = tk.Label(self.Basic_frame, text="语言:")
         self.languge_label.place(x=0,y=85)
 
-        self.languge_entry = encoding = ttk.Combobox(self.Basic_frame, values=self.language_entry_value, state="readonly",width=20)
-        self.languge_entry = encoding.place(x=50,y=85)
-        self.languge_entry = encoding.set("UTF-8")  # 默认值
+        self.languge_entry = ttk.Combobox(self.Basic_frame, values=self.language_entry_value, state="readonly",width=20)
+        self.languge_entry.place(x=50,y=85)
+        self.languge_entry.set("CP936:GBK")  # 默认值
         self.set_languge_button = tk.Button(self.Basic_frame, text="设置", width=8, command=lambda:self.SetParas(button_fun.LANGUGE_FUN))
         self.set_languge_button.place(x=150,y=110) 
 
@@ -161,7 +161,7 @@ class Paras_Set:
         #Part 4
         self.SetAllParas_button = tk.Button(self.frame, text="设置全部参数", width=30, command=lambda:self.SetParas(button_fun.SETALL_FUN))
         self.SetAllParas_button.place(x=450,y=80)        
-
+        self.SetAllParas_button.config(state='disabled')
         self.ResetParas_button = tk.Button(self.frame, text="恢复默认设置", width=30, command=lambda:self.SetParas(button_fun.RESET_FUN))
         self.ResetParas_button.place(x=450,y=120)
 
@@ -172,13 +172,13 @@ class Paras_Set:
 
         #查找距离
         self.black_mark_dis = "300"
-        self.create_label_entry_button(self.blackmark_frame, 0,"黑标查找距离", self.black_mark_dis, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_DISTAN_FUN))
+        self.black_mark_dis_entry = self.create_label_entry_button(self.blackmark_frame, 0,"黑标查找距离", self.black_mark_dis, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_DISTAN_FUN))
         #黑标宽度
         self.black_mark_width = "40"
-        self.create_label_entry_button(self.blackmark_frame,1, "黑标宽度", self.black_mark_width, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_WIDTH_FUN))    
+        self.black_mark_width_entry = self.create_label_entry_button(self.blackmark_frame,1, "黑标宽度", self.black_mark_width, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_WIDTH_FUN))    
         #黑标宽度
         self.black_mark_feed = "40"
-        self.create_label_entry_button(self.blackmark_frame,2, "找到黑标后进纸", self.black_mark_feed, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_FEED_FUN))    
+        self.black_mark_feed_entry = self.create_label_entry_button(self.blackmark_frame,2, "找到黑标后进纸", self.black_mark_feed, "mm", "设置",lambda:self.SetParas(button_fun.BLACK_FEED_FUN))    
         #设置黑标模式
         self.Create_black_button(self.blackmark_frame ,"设置黑标模式", 300,10,lambda:self.SetParas(button_fun.BLACK_ENABLE_FUN))         
         #取消黑标模式
@@ -197,34 +197,34 @@ class Paras_Set:
 
         #USB 接口类型
         self.USBType = ["打印口","虚拟串口"]
-        self.create_label_Combobox_button(self.product_frame,0,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(button_fun.USB_INTERFACE_TYPE))
+        self.USBTypeCombobox = self.create_label_Combobox_button(self.product_frame,0,0,"USB 设备类型",self.USBType,self.USBType[0],"设置",lambda:self.SetParas(button_fun.USB_INTERFACE_TYPE))
         #纸张类型
         self.PaperType = ["热敏票据纸","热敏标签纸","热敏孔洞纸","热敏黑标纸"]
-        self.create_label_Combobox_button(self.product_frame,1,0,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(button_fun.PAPER_TYPE))
+        self.PaperTypeCombobox = self.create_label_Combobox_button(self.product_frame,1,0,"纸张类型",self.PaperType,self.PaperType[0],"设置",lambda:self.SetParas(button_fun.PAPER_TYPE))
         #打印顺序
         self.PrintOrder = ["倒叙","正序"]
-        self.create_label_Combobox_button(self.product_frame,2,0,"纸张类型",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(button_fun.PRINTER_ORDER))
+        self.PrintOrderCombobox =  self.create_label_Combobox_button(self.product_frame,2,0,"打印顺序",self.PrintOrder,self.PrintOrder[0],"设置",lambda:self.SetParas(button_fun.PRINTER_ORDER))
         #票据回收时间
         self.RecytingTime = ["2","5","10","15","20","30","60"]
-        self.create_label_Combobox_button(self.product_frame,3,0,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(button_fun.RECYCLE_TIME))
+        self.RecytingTimeCombobox = self.create_label_Combobox_button(self.product_frame,3,0,"票据回收时间",self.RecytingTime,self.RecytingTime[1],"设置",lambda:self.SetParas(button_fun.RECYCLE_TIME))
         #纸张规则
         self.PaperFormat = ["1寸","2寸","3寸","4寸"]
-        self.create_label_Combobox_button(self.product_frame,4,0,"纸张规则",self.PaperFormat,self.PaperFormat[2],"设置",lambda:self.SetParas(button_fun.PAPER_RULES))
+        self.PaperFormatCombobox = self.create_label_Combobox_button(self.product_frame,4,0,"纸张规则",self.PaperFormat,self.PaperFormat[2],"设置",lambda:self.SetParas(button_fun.PAPER_RULES))
         #浓度等级
         self.Desitylevel = ["浓度等级1","浓度等级2","浓度等级3","浓度等级4","浓度等级5","浓度等级6","浓度等级7","浓度等级8"]
-        self.create_label_Combobox_button(self.product_frame,0,3,"浓度等级",self.Desitylevel,self.Desitylevel[3],"设置",lambda:self.SetParas(button_fun.DESITY_LEVEL))
+        self.DesitylevelCombobox = self.create_label_Combobox_button(self.product_frame,0,3,"浓度等级",self.Desitylevel,self.Desitylevel[3],"设置",lambda:self.SetParas(button_fun.DESITY_LEVEL))
         #走纸键
         self.FeedPaperKey = ["关闭","开启"]
-        self.create_label_Combobox_button(self.product_frame,1,3,"走纸键",self.FeedPaperKey,self.FeedPaperKey[0],"设置",lambda:self.SetParas(button_fun.FEED_PAPER_SWITCH))
+        self.FeedPaperKeyCombobox=self.create_label_Combobox_button(self.product_frame,1,3,"走纸键",self.FeedPaperKey,self.FeedPaperKey[0],"设置",lambda:self.SetParas(button_fun.FEED_PAPER_SWITCH))
         #打印机协议
-        self.PrintProcotol = ["ESC","TSPL","CPCL"]
-        self.create_label_Combobox_button(self.product_frame,2,3,"打印机协议",self.PrintProcotol,self.PrintProcotol[0],"设置",lambda:self.SetParas(button_fun.PRINTER_PROTOCOL))
+        self.PrintProcotol = ["ESC","TSPL","CPCL","JPL"]
+        self.PrintProcotolCombobox=self.create_label_Combobox_button(self.product_frame,2,3,"打印机协议",self.PrintProcotol,self.PrintProcotol[0],"设置",lambda:self.SetParas(button_fun.PRINTER_PROTOCOL))
         #堵纸侦测
         self.PaperJam = ["关闭","开启"]
-        self.create_label_Combobox_button(self.product_frame,3,3,"堵纸侦测",self.PaperJam,self.PaperJam[0],"设置",lambda:self.SetParas(button_fun.PAPER_JAM_SWITCH))   
+        self.PaperJamCombobox=self.create_label_Combobox_button(self.product_frame,3,3,"堵纸侦测",self.PaperJam,self.PaperJam[0],"设置",lambda:self.SetParas(button_fun.PAPER_JAM_SWITCH))   
         #打印速度
         self.PrintSpeed = ["1","2","3","4","5","6","7","8"]
-        self.create_label_Combobox_button(self.product_frame,4,3,"打印速度",self.PrintSpeed,self.PrintSpeed[0],"设置",lambda:self.SetParas(button_fun.PRINTER_SPEED))     
+        self.PrintSpeedCombobox=self.create_label_Combobox_button(self.product_frame,4,3,"打印速度",self.PrintSpeed,self.PrintSpeed[0],"设置",lambda:self.SetParas(button_fun.PRINTER_SPEED))     
 
         #设备名称
         self.devicename_frame = ttk.LabelFrame(self.frame, text="设备名称",width=150,height=175)
@@ -269,7 +269,8 @@ class Paras_Set:
         
         button = tk.Button(frame, text=button_text,command=butonn_fun,width=10)
         button.grid(row=rows, column=3, padx=1, pady=1) 
-       
+
+        return entry       
     def Create_black_button(self,frame,name,site_x,site_y,fun):
         button = tk.Button(frame, text=name,command=fun,font=("仿宋",10,"bold"))
         button.place(x=site_x,y=site_y) 
@@ -287,8 +288,14 @@ class Paras_Set:
         button = tk.Button(frame, text=button_text,command=butonn_fun,width=8)
         button.grid(row=rows, column=columns+2, padx=5, pady=1) 
 
+        return Combobox
     #Data Packet 发送的数据包 (组包)
-    def Send_Packaging(self,_Command,_Paramh,_Paraml,Data=None):
+    def Send_Packaging(self,_Command,_Paramh,_Paraml,Data=None,_StandordPro=True):
+        if _StandordPro == False:
+            Packet = Data
+            packet_str = ' '.join(f'{byte:02x}' for byte in Packet)
+            print(f"Packet={packet_str}")     
+            return      
         #包头 + 起始标志位
         Start_flag = b'\x02\x00'
         #命令,2字节，小端
@@ -367,13 +374,63 @@ class Paras_Set:
     #语言设置
     def Language_set(self):
         ChangeData = {
-            '硬件流控': "01",
-            '软件流控': "00",         
+            "CP932 SHIFT JIS": "fc",
+            "UNICODE UCS-2": "fd",
+            "CP950:BIG5": "fe",
+            "CP936:GBK": "ff",
+            "CP437:USA/Standard Europe": "00",
+            "Katakana": "01",
+            "CP850:Latin1;Western European": "02",
+            "CP860:Portuguese": "03",
+            "CP863:French Canadian": "04",
+            "CP865:Nordic": "05",
+            "CP1251:Cyrillic": "06",
+            "CP866:Russian;Cyrillic": "07",
+            "CP1025:Cyrillic/Bulgarian": "08",
+            "CP773:Estonian/Lithuanian/Latvian": "09",
+            "Iran": "0a",
+            "Reversed": "0b",
+            "CP862:Hebrew": "0f",
+            "CP1252:Latin1": "10",
+            "CP1253:Greek": "11",
+            "CP852:Latin2": "12",
+            "CP858:Latin1+Euro": "13",
+            "Iran II": "14",
+            "CP1117:Latvian": "15",
+            "CP864:Arabic": "16",
+            "ISO-8859-1:West Europe": "17",
+            "CP737:Greek": "18",
+            "CP1257:Baltic": "19",
+            "Thai": "1a",
+            "CP720:Arabic": "1b",
+            "CP855:Cyrillic": "1c",
+            "CP857:Turkish": "1d",
+            "CP1250:Central Europe": "1e",
+            "CP775:Estonian/Lithuanian/Latvian": "1f",
+            "CP1254:Turkish": "20",
+            "CP1255:Hebrew": "21",
+            "CP1256:Arabic": "22",
+            "CP1258:Vietnam": "23",
+            "ISO-8859-2:Latin2": "24",
+            "ISO-8859-3:Latin3": "25",
+            "ISO-8859-4:Baltic": "26",
+            "ISO-8859-5:Cyrillic":"27",
+            "ISO-8859-6:Arabic": "28",
+            "ISO-8859-7:Greek": "29",
+            "ISO-8859-8:Hebrew": "2a",
+            "ISO-8859-9:Turkish": "2b",
+            "ISO-8859-15:Latin3": "2c",
+            "Thai2": "2d",
+            "CP856:Hebrew": "2e",
+            "CP874:Thai": "2f",
+            "EUC-KR": "fa",
+            "UTF-8": "fb"
         }
-        Command = 0x8d
+
+        Command = 0x80
         Paramh = b'\x00\x00'
         Paraml = b'\x00\x00'
-        Old_Data = self.flow_control.get()
+        Old_Data = self.languge_entry.get()
         New_Data = ChangeData.get(Old_Data, "00")
         Data = bytes.fromhex(New_Data)
         return Command,Paramh,Paraml,Data      
@@ -437,7 +494,6 @@ class Paras_Set:
         return Command,Paramh,Paraml,Data  
     #休眠时间设置
     def Sleep_set(self):
-       
         Command = 0x86
         Paramh = b'\x00\x00'
         Paraml = b'\x00\x00'
@@ -453,6 +509,7 @@ class Paras_Set:
     #设置全部参数
     def All_Set(self):
         pass
+    
     #恢复出场设置
     def Reset_set(self):
         Command = 0x79
@@ -460,14 +517,257 @@ class Paras_Set:
         Paraml = b'\x00\x00'
         Data = None
         return Command,Paramh,Paraml,Data
+    #黑标设置:非统一指令
+    def Black_set(self):
+        Data = "1f 1b 1f 80 04 05 06 44"
+        return bytes.fromhex(Data)
+    def Black_cancel(self):
+        Data = "1f 1b 1f 80 04 05 06 66"
+        return bytes.fromhex(Data)
+    def Black_distance(self):
+        Cmd = "1f 1b 1f 81 04 05 06"
+        Value = int(self.black_mark_dis_entry.get())
+        Data = bytes.fromhex(Cmd) + Value.to_bytes(2, byteorder='big')
+        return Data
+    def Black_Width(self):
+        Cmd = "1f 1b 1f 82 04 05 06"
+        Value = int(self.black_mark_width_entry.get())
+        Data = bytes.fromhex(Cmd) + Value.to_bytes(2, byteorder='big')
+        return Data
+    def Black_Feed(self):
+        Cmd = "1d 28 46 04 00 01 00"
+        Value = int(self.black_mark_feed_entry.get())
+        Data = bytes.fromhex(Cmd) + Value.to_bytes(2, byteorder='little')
+        return Data
+    def Black_Find(self):
+        Cmd = "0c"
+        Data = bytes.fromhex(Cmd)
+        return Data
+    def Black_FindCut(self):
+        Cmd = "0c 1b 69"
+        Data = bytes.fromhex(Cmd)
+        return Data
+    def Black_PrintCut(self):
+        PrintData = """02 00 30 00  00 00 00 00  00 00 00 00  04 00 36 00  41 39 00 01  79
+        02 00 30 00  00 00 00 00  00 00 00 00  08 00 3a 00  01 02 04 08  10 20 40 80  ff
+        1b 40 1b 61  01 1b 21 00  57 65 6c 63  6f 6d 65 20  74 6f 20 70  72 69 6e 74  65 72 20 42  6c 61 63 6b
+        4d 61 72 6b  20 66 75 6e  63 74 69 6f  6e 0d 0a 1b  39 00 bb b6  d3 ad ca b9  d3 c3 ba da  b1 ea b9 a6
+        c4 dc 0d 0a  1b 39 03 c5  77 aa ef a8  cf a5 ce b6  c2 bc d0 a5  5c af e0 0d  0a 1d 28 6b  03 00 31 43
+        04 1d 28 6b  03 00 31 45  30 1d 28 6b  72 00 31 50  30 57 65 6c  63 6f 6d 65  20 74 6f 20  70 72 69 6e
+        74 65 72 20  42 6c 61 63  6b 4d 61 72  6b 20 66 75  6e 63 74 69  6f 6e 0a e6  ac a2 e8 bf  8e e4 bd bf
+        e7 94 a8 e6  89 93 e5 8d  b0 e6 9c ba  e7 9a 84 e9  bb 91 e6 a0  87 e5 8a 9f  e8 83 bd 0a  e6 ad a1 e8
+        bf 8e e4 bd  bf e7 94 a8  e5 8d b0 e8  a1 a8 e6 a9  9f e7 9a 84  e9 bb 91 e6  a8 99 e5 8a  9f e8 83 bd
+        1d 28 6b 03  00 31 51 30  0c 1b 69""" 
+        Data = bytes.fromhex(PrintData)
+        return Data
+    #产品设置
+    def Usb_TypeSet(self):
+        Value = self.USBTypeCombobox.get()
+        ChangeData = {
+            '打印口': "12 55 01",
+            '虚拟串口': "12 55 00",          
+        }
+        Data = ChangeData.get(Value, "12 55 01")
+        return bytes.fromhex(Data)
+    #纸张类型
+    def Paper_TypeSet(self):
+        Value = self.PaperTypeCombobox.get()
+        ChangeData = {
+            '热敏票据纸': "1f 41 00",
+            '热敏标签纸': "1f 41 01",
+            '热敏孔洞纸': "1f 41 02", 
+            '热敏黑标纸': "1f 41 03",          
+        }
+        Data = ChangeData.get(Value, "1f 41 00")
+        return bytes.fromhex(Data)    
+    #["倒叙","正序"]
+    def Print_OrderSet(self):
+        Value = self.PrintOrderCombobox.get()
+        ChangeData = {
+            '倒叙': "1b 70 f1",
+            '正序': "1b 70 f0",      
+        }
+        Data = ChangeData.get(Value, "1b 70 f0")
+        return bytes.fromhex(Data) 
+    #票据回收时间 ["2","5","10","15","20","30","60"]
+    def RecytingTime_Set(self):
+        ChangeData = {
+            '2': "02",
+            '5': "05",     
+            '10': "0a",
+            '15': "0f",  
+            '20': "14",
+            '30': "1e",   
+            '60': "3c",  
+        }
+        Command = 0x8c
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.RecytingTimeCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "02")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data
+    #纸张大小["1寸","2寸","3寸","4寸"]
+    def PaperFormat_Set(self):
+        ChangeData = {
+            '1寸': "03",
+            '2寸': "00",     
+            '3寸': "01",
+            '4寸': "02",    
+        }
+        Command = 0x90
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.PaperFormatCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "01")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data
+    #浓度等级  ["浓度等级1","浓度等级2","浓度等级3","浓度等级4","浓度等级5","浓度等级6","浓度等级7","浓度等级8"]
+    def Desitylevel_Set(self):
+        ChangeData = {
+            '浓度等级1': "80 01",
+            '浓度等级2': "80 02",     
+            '浓度等级3': "80 03",
+            '浓度等级4': "80 04",  
+            '浓度等级5': "80 05",
+            '浓度等级6': "80 06",     
+            '浓度等级7': "80 07",
+            '浓度等级8': "80 08",   
+        }
+        Command = 0x92
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.DesitylevelCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "80 04")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data
+    # ["关闭","开启"]
+    def FeedPaperKey_Set(self):
+        Value = self.FeedPaperKeyCombobox.get()
+        ChangeData = {
+            '关闭': "1b 63 35 f1",
+            '开启': "1b 63 35 f0",          
+        }
+        Data = ChangeData.get(Value, "1b 63 35 f0")
+        return bytes.fromhex(Data)
+    #打印机协议  ["ESC","TSPL","CPCL","JPL"]
+    def PrintProcotol_Set(self):
+        ChangeData = {
+            'ESC': "82 00",
+            'TSPL': "82 01",   
+            'CPCL': "82 02",
+            'JPL': "82 03",         
+        }
+        Command = 0x92
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.PrintProcotolCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "82 00")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data 
+    
+    # 堵纸侦测
+    def PaperJam_Set(self):
+        ChangeData = {
+            '关闭': "84 00",
+            '开启': "84 01",           
+        }
+        Command = 0x92
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.PaperJamCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "84 00")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data 
+    # 打印速度
+    def PrintSpeed_Set(self):
+        ChangeData = {
+            '1': "83 01",
+            '2': "83 02", 
+            '3': "83 03",
+            '4': "83 04",
+            '5': "83 05",
+            '6': "83 06",
+            '7': "83 07",
+            '8': "83 08",          
+        }
+        Command = 0x92
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Old_Data = self.PrintSpeedCombobox.get()
+        New_Data = ChangeData.get(Old_Data, "83 05")
+        Data = bytes.fromhex(New_Data)
+        return Command,Paramh,Paraml,Data 
+    #产品设置
+    def Product_set(self):
+        Command = 0x85
+        Paramh = b'\x00\x00'
+        Paraml = b'\x00\x00'
+        Name = self.decicename_lentry.get()
+        hex_string = Name.encode('utf-8').hex()
+        if len(hex_string) < 40:
+            hex_string = hex_string.ljust(40, '0')  # 用'0'填充到40个字符
+        Data1 = bytes.fromhex(hex_string)   
+
+        Number = self.decicenum_lentry.get()
+        hex_string = Number.encode('utf-8').hex()
+        if len(hex_string) < 40:
+            hex_string = hex_string.ljust(40, '0')  # 用'0'填充到40个字符
+        Data2 = bytes.fromhex(hex_string) 
+
+        Data = Data1 + Data2
+        return Command,Paramh,Paraml,Data 
     
     def SetParas(self,Num):
+        StandorPro = False
+        if Num.value in(7,8,9,10,11,12,13,14,15,16,17,21):
+            StandorPro = False
+        else :
+            StandorPro = True
+     
+        callback_fun = {
+            button_fun.BAUD_RATE_FUN.value:self.BaudRate_set(),
+            button_fun.FLOW_FUN.value:self.Flow_set(),
+            button_fun.LANGUGE_FUN.value:self.Language_set(),
+            button_fun.PART1_FUN.value:self.Part1_set(),
+            button_fun.PART2_FUN.value:self.Sleep_set(),
+            button_fun.SETALL_FUN.value:self.All_Set(),
+            button_fun.RESET_FUN.value:self.Reset_set(),
+            button_fun.BLACK_DISTAN_FUN.value:self.Black_distance(),
+            button_fun.BLACK_WIDTH_FUN.value:self.Black_Width(),
+            button_fun.BLACK_FEED_FUN.value:self.Black_Feed(),
+            button_fun.BLACK_ENABLE_FUN.value:self.Black_set(),
+            button_fun.BLACK_DISABILITY_FUN.value:self.Black_cancel(),
+            button_fun.BLACK_FIND_FUN.value:self.Black_Find(),
+            button_fun.BLACK_FINDCUT_FUN.value:self.Black_FindCut(),
+            button_fun.BLACK_PRINTTEST_FUN.value:self.Black_PrintCut(),
+            button_fun.USB_INTERFACE_TYPE.value:self.Usb_TypeSet(),
+            button_fun.PAPER_TYPE.value:self.Paper_TypeSet(),
+            button_fun.PRINTER_ORDER.value:self.Print_OrderSet(),
+            button_fun.RECYCLE_TIME.value:self.RecytingTime_Set(),
+            button_fun.PAPER_RULES.value:self.PaperFormat_Set(),
+            button_fun.DESITY_LEVEL.value:self.Desitylevel_Set(),
+            button_fun.FEED_PAPER_SWITCH.value:self.FeedPaperKey_Set(),
+            button_fun.PRINTER_PROTOCOL.value:self.PrintProcotol_Set(),
+            button_fun.PAPER_JAM_SWITCH.value:self.PaperJam_Set(),
+            button_fun.PRINTER_SPEED.value:self.PrintSpeed_Set(),
+            button_fun.DEVICE_NAME.value:self.Product_set(),
+        }
+        func = callback_fun.get(Num.value, None)
+
         Command = 0x00
         Paramh = b'\x00\x00'
         Paraml = b'\x00\x00'
         Data   = []
-        Command,Paramh,Paraml,Data = self.Reset_set()
-        self.Send_Packaging(Command,Paramh,Paraml,Data)
+        
+        if StandorPro:
+            Command,Paramh,Paraml,Data = func
+        else :
+            Data = func
+
+        self.Send_Packaging(Command,Paramh,Paraml,Data,StandorPro)    
+            
+
 
 if __name__ == "__main__":
     root = tk.Tk()
