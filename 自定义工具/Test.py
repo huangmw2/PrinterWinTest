@@ -1,7 +1,7 @@
 import socket
 import tkinter as tk
 from tkinter import messagebox
-
+import time
 # 设置服务器的IP地址和端口
 server_ip = '192.168.0.204'  # 替换为你的服务器IP
 server_port = 9100        # 替换为你的服务器端口
@@ -13,10 +13,15 @@ class TCPClientApp:
         self.master.geometry("400x300")
         # 创建 TCP 套接字并连接到服务器
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.client_socket.settimeout(2)  # 设置连接超时为2秒
+        start_time = time.time()  # 记录开始时间
         try:
             self.client_socket.connect((server_ip, server_port))
             print("连接到服务器成功")
         except Exception as e:
+            end_time = time.time()
+            elapsed_time = end_time - start_time
             messagebox.showerror("错误", "连接失败: " + str(e))
             master.destroy()  # 关闭窗口
 

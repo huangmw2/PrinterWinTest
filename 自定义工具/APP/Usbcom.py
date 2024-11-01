@@ -6,6 +6,7 @@ import serial
 import serial.tools.list_ports
 import logging
 import time
+import socket
 try:
     from APP.Log import log_message
 except ImportError:
@@ -28,7 +29,11 @@ class Dll_Init:
             self.Join_dll()
         else :
             pass
-
+        #网口信息
+        self.client_socket = None
+        self.socket_ip = None
+        self.socket_port = None
+        self.connected = False
     def Getdll_path(self):
         APP_DIR = os.getcwd()
        # MAIN_DIR = os.path.dirname(APP_DIR)
@@ -199,17 +204,45 @@ class Dll_Init:
     #网口通信
 
     #打开网口
-    def Open_EthernetTcp(self):
-        pass
+    def Open_EthernetTcp(self,server_ip,server_port):
+        # 创建 TCP 套接字并连接到服务器
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.settimeout(2)
+        #ip地址
+        self.socket_ip = server_ip
+        self.socket_port = server_port
+        print(f"IP= {self.socket_ip},Port={self.socket_port}")
+        try:
+            self.client_socket.connect((self.socket_ip, self.socket_port))
+            log = "连接成功"
+            self.connected = True
+        except Exception as e:
+            log = "错误", "连接失败:  {}".format(e)
+            log_message(log,logging.ERROR)
+            return False
+        return True
     #网口写入数据
-    def Write_EthernetTcp(self):
-        pass
+    def Write_EthernetTcp(self,data):
+        try:
+            ret = self.client_socket.sendall(data)
+            log = ">>>>>> 任务发送成功，返回：{}  <<<<<<".format(ret)
+            log_message(log,logging.DEBUG)
+        except Exception as e:
+            log = "网络错误：发送数据失败{}".format(e)
+            log_message(log,logging.ERROR)
+
     #网口读取数据
     def Read_EthernetTcp(self):
         pass
     #网口关闭
     def Close_EthernetTcp(self):
-        pass
+        # 关闭套接字并退出
+        if self.connected:
+            self.client_socket.close()
+            self.connected = False
+            log = "关闭网络连接"
+            log_message(log,logging.DEBUG)
+
 
     def Print_selfTest(self):
         ret = self.mylib.Pos_SelfTest()

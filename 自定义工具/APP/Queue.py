@@ -90,6 +90,9 @@ class QueueHandlder:
 
         elif Com_type == "串口":
             Comm_class.Write_serialCom(Data)
+
+        elif Com_type == "网口":
+            Comm_class.Write_EthernetTcp(Data)
         else :
             print("Other Com")
             pass

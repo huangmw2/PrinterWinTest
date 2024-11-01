@@ -161,7 +161,18 @@ class StartUpWindow:
             self.Test_button.config(state='normal')   
             log_message("打开USB端口",logging.DEBUG)
     def OpenEth_port(self):
-        pass
+        EthernetIp = self.EthernetIp.get()
+        EthernetPort= int(self.PortNum_entry.get())
+        ret = Comm_class.Open_EthernetTcp(EthernetIp,EthernetPort)
+        if not ret:
+            messagebox.showerror("错误", "网络连接失败")
+            return                
+        for widget in self.CommOption_frame.winfo_children():
+            widget.config(state='disabled')
+            # 仅保留关闭端口按钮可用
+        self.ClosePort_button.config(state='normal')
+        self.Test_button.config(state='normal')  
+        log_message("网络连接成功",logging.DEBUG)
 
     def OpenLpt_port(self):
         pass
@@ -191,7 +202,9 @@ class StartUpWindow:
             Comm_class.Close_UsbCom()
         elif self.Comm_option.get() == "串口":
             Comm_class.Close_serialCom()
-
+        elif self.Comm_option.get() == "网口":
+            Comm_class.Close_EthernetTcp()
+            
     def connect_test(self):
         global Global_Comtype
         Global_Comtype = self.Comm_option.get()
