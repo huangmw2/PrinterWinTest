@@ -4,9 +4,17 @@ import re
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+if __name__ == "__main__":
+    from Queue import queue_handler
+else :
+    from APP.Queue import queue_handler
 
 class Tspl_Test:
     def __init__(self,parent):
+        #索引号
+        self.index = 0
+        #停止标志
+        self.stop_flag = False
         #变量：是否循环发送
         self.loop_var = tk.BooleanVar()
         self.loop_var.set(False)
@@ -23,48 +31,37 @@ class Tspl_Test:
         self.frame = tk.Frame(parent, bd=2, relief=tk.GROOVE)
         self.frame.pack(fill=tk.BOTH, expand=True)
         #创建按钮区域
-        button_frame = tk.Frame(self.frame)
-        button_frame.pack(side=tk.TOP, fill=tk.X)
+        self.button_frame = tk.Frame(self.frame)
+        self.button_frame.pack(side=tk.TOP, fill=tk.X)
         #创建一键测试按钮
-        self.OneClick_test =  tk.Button(button_frame, text="一键测试",width=8,command=self.OneClickTest,font=("仿宋",12,"bold"))
+        self.OneClick_test =  tk.Button(self.button_frame, text="一键测试",width=8,command=self.OneClickTest,font=("仿宋",12,"bold"))
         self.OneClick_test.pack(side=tk.LEFT, padx=2, pady=(1,0))
         #创建一个单条测试的按钮
-        self.Delay_time = tk.Button(button_frame, text="单条测试",width=8,command=self.DelaySet,font=("仿宋",12,"bold"))
+        self.Delay_time = tk.Button(self.button_frame, text="单条测试",width=8,command=self.DelaySet,font=("仿宋",12,"bold"))
         self.Delay_time.pack(side=tk.LEFT, padx=2, pady=1)
         #创建测试条目的输入区
-        self.TestNumber_entry = tk.Entry(button_frame,width=5)
+        self.TestNumber_entry = tk.Entry(self.button_frame,width=5)
         self.TestNumber_entry.pack(side=tk.LEFT, padx=1, pady=1)
         self.TestNumber_entry.insert(0,"1")       
         #时间间隔
-        self.lable = tk.Label(button_frame,text="间隔:",font=("仿宋",10))
+        self.lable = tk.Label(self.button_frame,text="间隔:",font=("仿宋",10))
         self.lable.pack(side=tk.LEFT,padx=2,pady=10)
         #创建一个输入时间输入区域
-        self.Delay_time_entry = tk.Entry(button_frame,width=7)
+        self.Delay_time_entry = tk.Entry(self.button_frame,width=7)
         self.Delay_time_entry.pack(side=tk.LEFT, padx=2, pady=1)
         self.Delay_time_entry.insert(0,"3000")
         #毫秒
-        self.lable = tk.Label(button_frame,text="ms",font=("仿宋",10))
+        self.lable = tk.Label(self.button_frame,text="ms",font=("仿宋",10))
         self.lable.pack(side=tk.LEFT,padx=2,pady=10)    
-        #循环发送
-        self.Loop_button = tk.Checkbutton(button_frame,
-                                          text="循环发送",
-                                          variable=self.loop_var,
-                                          onvalue=True,
-                                          offvalue=False,
-                                          command=self.Loop_status,
-                                          font=("仿宋",10))
-        self.Loop_button.pack(side=tk.LEFT,padx=2,pady=1)
-        #保存
-        self.Save_Data_button = tk.Button(button_frame,text="保存数据",width=8,command=self.SaveData,font=("仿宋",10))
-        self.Save_Data_button.pack(side=tk.LEFT,padx=2,pady=1)
+
         # 创建停止按钮
-        self.Stop_button = tk.Button(button_frame,
+        self.Stop_button = tk.Button(self.button_frame,
                                      text="停止",
                                      width=5,
                                      command=self.StopAction,
-                                     bg="red",
                                      font=("仿宋", 10, "bold"))
-        self.Stop_button.pack(side=tk.LEFT, padx=2, pady=1)         
+        self.Stop_button.pack(side=tk.LEFT, padx=2, pady=1)  
+        self.Stop_button.config(state='disabled')      
         #修改标签的宽度和高度
         self.control_frame = tk.Frame(self.frame)
         self.control_frame.pack(side=tk.TOP, fill=tk.X, pady=1)
@@ -85,8 +82,11 @@ class Tspl_Test:
         self.SetParms_button = tk.Button(self.control_frame,text="设置",width=6,command=self.ParmsSet,font=("仿宋",10))
         self.SetParms_button.pack(side=tk.LEFT,padx=5, pady=1)
         #添加TSPL命令
-        self.AddTsplCmd_button = tk.Button(self.control_frame,text="添加TSPL指令",width=12,command=self.AddCmd,font=("仿宋",12))
+        self.AddTsplCmd_button = tk.Button(self.control_frame,text="添加TSPL指令",width=12,command=self.AddCmd,font=("仿宋",10))
         self.AddTsplCmd_button.pack(side=tk.LEFT,padx=5, pady=1)
+        #保存
+        self.Save_Data_button = tk.Button(self.control_frame,text="保存数据",width=8,command=self.SaveData,font=("仿宋",10))
+        self.Save_Data_button.pack(side=tk.LEFT,padx=2,pady=1)
         #创建画布和滚动条
         canvas = tk.Canvas(self.frame)
         scrollbar = tk.Scrollbar(self.frame, orient=tk.VERTICAL, command=canvas.yview)
@@ -111,10 +111,41 @@ class Tspl_Test:
             text_box.insert(tk.END, data)
             self.textboxs.append(text_box)
 
+    def loop_Send(self):
+        Delay_time = int(self.Delay_time_entry.get())
+        if self.index >= len(self.textboxs):
+            self.StopAction()
+
+        if self.stop_flag == False:
+            Data = self.textboxs[self.index].get("1.0", tk.END) 
+            log = "发送第{}条,TSPL数据".format(self.index+1)
+            print(log)
+            queue_handler.write_to_queue(Data,log)
+            self.index += 1 
+            self.frame.after(Delay_time, self.loop_Send)
+        else :
+            print("通信结束") 
+
     def OneClickTest(self):
-        pass
+        for widget in self.button_frame.winfo_children():
+            widget.config(state='disabled')
+        for widget in self.control_frame.winfo_children():
+            widget.config(state='disabled')
+        self.Stop_button.config(state='normal',bg='red')
+        self.index = 0
+        self.stop_flag = False
+        self.loop_Send()
+        
+
     def DelaySet(self):
-        pass
+        Number = int(self.TestNumber_entry.get())
+        if Number > len(self.textboxs) or Number == 0:
+            messagebox.showerror("错误","输入的测试条目不对")
+            return 
+        Data = self.textboxs[Number-1].get("1.0", tk.END) 
+        log = "发送第{}条,TSPL数据".format(Number)
+        queue_handler.write_to_queue(Data,log)  
+
     def SaveData(self):
         """将文本数据保存到文件中，每个数据块用分隔符分隔。"""
         try:
@@ -136,11 +167,15 @@ class Tspl_Test:
             # 清除可能的空字符串
             self.text_data_list = [data.strip() for data in self.text_data_list if data.strip()]    
 
-    def Loop_status(self):
-        pass
-
     def StopAction(self):
         print("停止按钮被点击")
+        for widget in self.button_frame.winfo_children():
+            widget.config(state='normal')
+        for widget in self.control_frame.winfo_children():
+            widget.config(state='normal')
+        self.Stop_button.config(state='disabled',bg='white')
+        self.stop_flag = True
+
     # 替换包含 "SIZE" 的行
     def replace_size_lines(self,text):
         width = self.lable_Width_entry.get()
@@ -160,3 +195,8 @@ class Tspl_Test:
         text_box.insert(tk.END, "")
         self.textboxs.append(text_box)
 
+if __name__ == "__main__":
+
+    root = tk.Tk()
+    app = Tspl_Test(root)
+    root.mainloop()

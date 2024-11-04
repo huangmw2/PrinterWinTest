@@ -38,6 +38,11 @@ class Esc_Test:
         # 发送区域
         send_frame = ttk.LabelFrame(self.frame, text="发送区")
         send_frame.grid(row=0, column=0, padx=1, pady=1, sticky="nsew")
+        # 停止标志位
+        self.stop_flag = False
+        #临时数据
+        self.Temp_data = None
+        self.SentTimes = 0 #已经发送的次数
         # 创建滚动条
         send_scrollbar = ttk.Scrollbar(send_frame)
         send_scrollbar.grid(row=0, column=1, padx=1, pady=1,sticky='ns')
@@ -120,11 +125,11 @@ class Esc_Test:
         self.Interval_ms_label = tk.Label(self.function_frame, text="ms",font=("仿宋",10))
         self.Interval_ms_label.grid(row=0,column=5,padx=5,pady=5) 
         #每次多少张
-        self.Sheet_num_entry = tk.Entry(self.function_frame,width=3)
+        self.Sheet_num_entry = tk.Entry(self.function_frame,width=6)
         self.Sheet_num_entry.grid(row=0, column=6, padx=0, pady=5, sticky="w")
         self.Sheet_num_entry.insert(0,"1")
         #张/次
-        self.Sheet_num_label = tk.Label(self.function_frame, text="张/次",font=("仿宋",10))
+        self.Sheet_num_label = tk.Label(self.function_frame, text="次",font=("仿宋",10))
         self.Sheet_num_label.grid(row=0,column=7,padx=5,pady=5) 
         #添加编号
         self.Serial_num = tk.BooleanVar()
@@ -145,9 +150,14 @@ class Esc_Test:
         self.Start_SerialNum_entry.place(x=170,y=38) 
         self.Start_SerialNum_entry.insert(0,"1")
 
+        # 是否有图片标志位
+        self.image_Flag = False
         # 加载图片
         self.Send_image_path = os.getcwd() + r"\Data\Image\send.png"
         self.Send_image2_path = os.getcwd() + r"\Data\Image\send2.png" 
+        self.Stop_image_path = os.getcwd() + r"\Data\Image\stop.png"
+        self.Stop_image2_path = os.getcwd() + r"\Data\Image\stop2.png"
+
         if not os.path.exists(self.Send_image_path) :
             log = "没有找到图片1的路径:{}".format(self.Send_image_path)
             log_message(log,logging.ERROR)
@@ -161,17 +171,22 @@ class Esc_Test:
             logging.getLogger('PIL').setLevel(logging.WARNING)
             original_img1 = Image.open(self.Send_image_path)
             original_img2 = Image.open(self.Send_image2_path)
+            original_img3 = Image.open(self.Stop_image_path)
+            original_img4 = Image.open(self.Stop_image2_path)            
             # 设置目标宽高
             target_size = (100, 40)  #宽20，高10
             # 调整图片大小
             self.img1 = ImageTk.PhotoImage(original_img1.resize(target_size))
             self.img2 = ImageTk.PhotoImage(original_img2.resize(target_size))  
+            self.img3 = ImageTk.PhotoImage(original_img3.resize(target_size))
+            self.img4 = ImageTk.PhotoImage(original_img4.resize(target_size))  
+
             self.Send_Data_button = tk.Button(self.function_frame,image=self.img1, borderwidth=0,highlightthickness=0,command=self.Send_TextData)
             
             # 绑定事件
             self.Send_Data_button.bind("<Enter>", self.on_enter_imag)
             self.Send_Data_button.bind("<Leave>", self.on_leave_imag)
-
+            self.image_Flag = True
         self.Send_Data_button.place(x=5,y=65)  # 使用 place 布局 
         # 在初始化时调用,有些要置灰
         self.Loop_send()  
@@ -326,11 +341,17 @@ class Esc_Test:
 
     #移动到图片
     def on_enter_imag(self,event):
-        self.Send_Data_button.config(image=self.img2)
+        if self.stop_flag:
+            self.Send_Data_button.config(image=self.img4)
+        else :
+            self.Send_Data_button.config(image=self.img2)
 
     #离开图片
     def on_leave_imag(self,event):
-        self.Send_Data_button.config(image=self.img1)
+        if self.stop_flag:
+            self.Send_Data_button.config(image=self.img3)
+        else :
+            self.Send_Data_button.config(image=self.img1)
 
     def on_barcode_type_change(self, event):
         """
@@ -742,22 +763,41 @@ class Esc_Test:
         entry.grid(row=_row, column=3, padx=1, pady=2,sticky="w")
         return entry
     
-    def Send_TextData(self):
-        # 获取文本框的数据
-        text_data = self.send_text.get("1.0", tk.END)  # 从第一行第一列到最后
-        hex_flag = self.Hex_send_flag.get()
-        hex_data = re.findall(r'[0-9A-Fa-f]+', text_data)
-        #获取发送方式
-        loop_flag = self.Send_loop.get()
+    def Loop_Send_Fun(self):
         Send_times = self.Send_times_entry.get()
-        Delay_time = self.Interval_times_entry.get()
-        #每张次数
-        Times =  self.Sheet_num_entry.get()
+        Delay_time = int(self.Interval_times_entry.get())
         #添加编码
         Number_Flag = self.Serial_num.get()
         #编码开始号码
         Start_Number = self.Start_SerialNum_entry.get()
 
+        if self.SentTimes >= int(Send_times):
+            self.stop_flag = False
+
+        if self.stop_flag:
+            self.SentTimes+=1
+            log = "循环发送" + str(self.SentTimes) + "/" + Send_times
+            self.Sheet_num_entry.delete(0,tk.END)
+            self.Sheet_num_entry.insert(0,str(self.SentTimes))
+            queue_handler.write_to_queue(self.Temp_data,log) 
+            self.frame.after(Delay_time, self.Loop_Send_Fun)
+        else :
+            self.Loop_send()
+            if self.image_Flag:
+                self.Send_Data_button.config(image=self.img2)
+            else :
+                self.Send_Data_button.config(text="发送")       
+    def Send_TextData(self):
+        # 获取文本框的数据
+        loop_flag = self.Send_loop.get()
+        Delay_time = int(self.Interval_times_entry.get())
+        if self.stop_flag == True:
+            self.stop_flag = False
+            self.Loop_Send_Fun()
+            return 
+        text_data = self.send_text.get("1.0", tk.END)  # 从第一行第一列到最后
+        hex_flag = self.Hex_send_flag.get()
+        hex_data = re.findall(r'[0-9A-Fa-f]+', text_data)
         new_hex_data = [item for item in hex_data if len(item) > 1]
         # 将过滤后的数据合并为一个字符串
         filtered_text = ''.join(new_hex_data)
@@ -765,12 +805,30 @@ class Esc_Test:
             try :
                 byte_data = bytes.fromhex(filtered_text)
                 queue_handler.write_to_queue(byte_data,"发送文本框数据(16进制)")   
+                self.Temp_data = byte_data
             except ValueError as e:
                 messagebox.showerror("错误", f"文本框数据有错\n错误信息: {e}")
+                return 
         else :
              queue_handler.write_to_queue(text_data,"发送文本框数据(非16进制)")    
-        if loop_flag:
-            self.frame.after(100, self.update_timer)  # 每 100 毫秒更新一次
+             self.Temp_data = text_data
+        #获取发送方式
+        if loop_flag == True:
+            self.stop_flag = True
+            self.SentTimes = 1
+            self.Sheet_num_entry.delete(0,tk.END)
+            self.Sheet_num_entry.insert(0,str(self.SentTimes))
+            for widget in self.function_frame.winfo_children():
+                widget.config(state='disabled')
+            self.Send_Data_button.config(state='normal')
+            self.Sheet_num_entry.config(state='normal')
+            if self.image_Flag:
+                self.Send_Data_button.config(image=self.img4)
+            else :
+                self.Send_Data_button.config(text="停止")
+        if self.stop_flag:
+            self.frame.after(Delay_time, self.Loop_Send_Fun)
+
     def Add_SerialNum(self):
         ret = self.Serial_num.get()
         if not ret :
