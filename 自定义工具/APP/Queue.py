@@ -30,6 +30,9 @@ class QueueHandlder:
 
     def receive_queue(self,comtype,update_callback=None):
         ret_data = 0XFF
+        #写入一个队列
+        byte_data = bytes.fromhex("10 04 01 00")
+        self.write_to_queue(byte_data,"初始化")
         while self.Rrunning:
             if comtype == "USB":
                 ret_data = Comm_class.Read_Usbdata()

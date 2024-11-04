@@ -144,9 +144,7 @@ class Esc_Test:
         self.Start_SerialNum_entry = tk.Entry(self.function_frame,width=7)
         self.Start_SerialNum_entry.place(x=170,y=38) 
         self.Start_SerialNum_entry.insert(0,"1")
-        # 在初始化时调用,有些要置灰
-        self.Loop_send()  
-        self.Add_SerialNum()
+
         # 加载图片
         self.Send_image_path = os.getcwd() + r"\Data\Image\send.png"
         self.Send_image2_path = os.getcwd() + r"\Data\Image\send2.png" 
@@ -175,6 +173,9 @@ class Esc_Test:
             self.Send_Data_button.bind("<Leave>", self.on_leave_imag)
 
         self.Send_Data_button.place(x=5,y=65)  # 使用 place 布局 
+        # 在初始化时调用,有些要置灰
+        self.Loop_send()  
+        self.Add_SerialNum()
         # 快捷测试功能
         quick_test_frame = ttk.LabelFrame(self.frame, text="快捷测试功能区")
         quick_test_frame.place(x=400,y=0,width=300,height=500)
@@ -746,6 +747,16 @@ class Esc_Test:
         text_data = self.send_text.get("1.0", tk.END)  # 从第一行第一列到最后
         hex_flag = self.Hex_send_flag.get()
         hex_data = re.findall(r'[0-9A-Fa-f]+', text_data)
+        #获取发送方式
+        loop_flag = self.Send_loop.get()
+        Send_times = self.Send_times_entry.get()
+        Delay_time = self.Interval_times_entry.get()
+        #每张次数
+        Times =  self.Sheet_num_entry.get()
+        #添加编码
+        Number_Flag = self.Serial_num.get()
+        #编码开始号码
+        Start_Number = self.Start_SerialNum_entry.get()
 
         new_hex_data = [item for item in hex_data if len(item) > 1]
         # 将过滤后的数据合并为一个字符串
@@ -758,7 +769,8 @@ class Esc_Test:
                 messagebox.showerror("错误", f"文本框数据有错\n错误信息: {e}")
         else :
              queue_handler.write_to_queue(text_data,"发送文本框数据(非16进制)")    
-
+        if loop_flag:
+            self.frame.after(100, self.update_timer)  # 每 100 毫秒更新一次
     def Add_SerialNum(self):
         ret = self.Serial_num.get()
         if not ret :
@@ -774,6 +786,7 @@ class Esc_Test:
             for widget in self.function_frame.winfo_children():
                 widget.config(state='disabled')
             self.Loop_send_check.config(state='normal')
+            self.Send_Data_button.config(state='normal')
         else :
             for widget in self.function_frame.winfo_children():
                 widget.config(state='normal')           
