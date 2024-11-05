@@ -111,6 +111,13 @@ class Tspl_Test:
             text_box.insert(tk.END, data)
             self.textboxs.append(text_box)
 
+    def is_valid_data(self,s):
+        """
+        检查字符串是否只包含合法字符：'0~9', 'A~F', 空格和回车符。
+        """
+        # 正则表达式检查：允许0-9, A-F (不区分大小写), 空格和回车符
+        return bool(re.match(r'^[0-9A-Fa-f \r\n]+$', s))
+    
     def loop_Send(self):
         Delay_time = int(self.Delay_time_entry.get())
         if self.index >= len(self.textboxs):
@@ -118,8 +125,9 @@ class Tspl_Test:
 
         if self.stop_flag == False:
             Data = self.textboxs[self.index].get("1.0", tk.END) 
+            if self.is_valid_data(Data):
+                print(Data)
             log = "发送第{}条,TSPL数据".format(self.index+1)
-            print(log)
             queue_handler.write_to_queue(Data,log)
             self.index += 1 
             self.frame.after(Delay_time, self.loop_Send)
@@ -150,7 +158,7 @@ class Tspl_Test:
         """将文本数据保存到文件中，每个数据块用分隔符分隔。"""
         try:
             os.makedirs(os.path.dirname(self.DataPath), exist_ok=True)
-            with open(self.DataPath, 'w', encoding='utf-8') as file:
+            with open(self.DataPath, 'w', encoding='cp936',errors='replace') as file:
                 for text_box in self.textboxs:
                     text_data = text_box.get("1.0", tk.END).strip()
                     file.write(text_data + '\n=====\n')
@@ -161,9 +169,9 @@ class Tspl_Test:
     def Load_TextData(self,file_path):
         if not os.path.exists(file_path):
             return 
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'r', encoding='cp936',errors='replace') as file:
             content = file.read()
-            self.text_data_list = content.split('\n=====\n')
+            self.text_data_list = content.split('=====')
             # 清除可能的空字符串
             self.text_data_list = [data.strip() for data in self.text_data_list if data.strip()]    
 

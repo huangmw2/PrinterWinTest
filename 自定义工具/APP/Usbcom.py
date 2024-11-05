@@ -99,7 +99,7 @@ class Dll_Init:
         return 1
     def Write_Usbdata(self,data):
         if isinstance(data, str):
-            encoded_data = data.encode('utf-8')
+            encoded_data = data.encode('cp936')
         else :
             encoded_data = data
         buf =  ctypes.create_string_buffer(bytes(encoded_data))  # 创建字符串缓冲区
@@ -177,7 +177,7 @@ class Dll_Init:
                 log_message(log,logging.WARNING)
                 self.ser.open()    
             if isinstance(data, str):
-                 encoded_data = data.encode('utf-8')
+                 encoded_data = data.encode('cp936')
             else :
                  encoded_data = data 
             result = self.ser.write(encoded_data)

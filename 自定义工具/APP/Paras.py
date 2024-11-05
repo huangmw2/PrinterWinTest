@@ -3,6 +3,10 @@ import tkinter as tk
 from tkinter import ttk
 from enum import Enum
 import struct
+if __name__ == "__main__":
+    from Queue import queue_handler
+else :
+    from APP.Queue import queue_handler
 
 class button_fun(Enum):
     BAUD_RATE_FUN = 0
@@ -290,11 +294,13 @@ class Paras_Set:
 
         return Combobox
     #Data Packet 发送的数据包 (组包)
-    def Send_Packaging(self,_Command,_Paramh,_Paraml,Data=None,_StandordPro=True):
+    def Send_Packaging(self,_Command,_Paramh,_Paraml,Data=None,_StandordPro=True,Name=" "):
         if _StandordPro == False:
             Packet = Data
-            packet_str = ' '.join(f'{byte:02x}' for byte in Packet)
-            print(f"Packet={packet_str}")     
+            self.Log_text.delete("1.0",tk.END)
+            log = "发送{}设置命令".format(Name)
+            self.Log_text.insert(tk.END,log)
+            queue_handler.write_to_queue(Packet,log)  
             return      
         #包头 + 起始标志位
         Start_flag = b'\x02\x00'
@@ -328,8 +334,10 @@ class Paras_Set:
         else :
             Packet = Start_flag + Command + Param_h + Param_l + Device_Id + Data_length + bytes([CheckSum]) + Reserved
         #数据包
-        packet_str = ' '.join(f'{byte:02x}' for byte in Packet)
-        print(f"Packet={packet_str}")
+        self.Log_text.delete("1.0",tk.END)
+        log = "发送{}设置命令".format(Name)
+        self.Log_text.insert(tk.END,log)
+        queue_handler.write_to_queue(Packet,log)  
     #连通数据
     def Connect_testing(self):
         Command = 0x30
@@ -753,19 +761,49 @@ class Paras_Set:
             button_fun.PRINTER_SPEED.value:self.PrintSpeed_Set(),
             button_fun.DEVICE_NAME.value:self.Product_set(),
         }
+        callback_name = {
+            button_fun.BAUD_RATE_FUN.value:"波特率",
+            button_fun.FLOW_FUN.value:"流控",
+            button_fun.LANGUGE_FUN.value:"语言",
+            button_fun.PART1_FUN.value:"基础参数",
+            button_fun.PART2_FUN.value:"休眠时间",
+            button_fun.SETALL_FUN.value:"设置所有参数",
+            button_fun.RESET_FUN.value:"恢复出厂",
+            button_fun.BLACK_DISTAN_FUN.value:"黑标查找距离",
+            button_fun.BLACK_WIDTH_FUN.value:"黑标宽度",
+            button_fun.BLACK_FEED_FUN.value:"找到黑标走纸长度",
+            button_fun.BLACK_ENABLE_FUN.value:"使能黑标",
+            button_fun.BLACK_DISABILITY_FUN.value:"取消黑标",
+            button_fun.BLACK_FIND_FUN.value:"查找黑标",
+            button_fun.BLACK_FINDCUT_FUN.value:"查找黑标并切纸",
+            button_fun.BLACK_PRINTTEST_FUN.value:"打印测试",
+            button_fun.USB_INTERFACE_TYPE.value:"USB接口类型",
+            button_fun.PAPER_TYPE.value:"纸张类型",
+            button_fun.PRINTER_ORDER.value:"打印顺序",
+            button_fun.RECYCLE_TIME.value:"回收时间",
+            button_fun.PAPER_RULES.value:"纸张大小",
+            button_fun.DESITY_LEVEL.value:"打印浓度",
+            button_fun.FEED_PAPER_SWITCH.value:"走纸键开关",
+            button_fun.PRINTER_PROTOCOL.value:"打印机协议",
+            button_fun.PAPER_JAM_SWITCH.value:"堵纸开关",
+            button_fun.PRINTER_SPEED.value:"打印速度",
+            button_fun.DEVICE_NAME.value:"产品参数",
+        }
         func = callback_fun.get(Num.value, None)
-
+        Name = callback_name.get(Num.value, " ")
         Command = 0x00
         Paramh = b'\x00\x00'
         Paraml = b'\x00\x00'
         Data   = []
-        
+        #发送连接测试命令
+        Command,Paramh,Paraml,Data = self.Connect_testing()
+        self.Send_Packaging(Command,Paramh,Paraml,Data,True,"发送连接测试") 
         if StandorPro:
             Command,Paramh,Paraml,Data = func
         else :
             Data = func
 
-        self.Send_Packaging(Command,Paramh,Paraml,Data,StandorPro)    
+        self.Send_Packaging(Command,Paramh,Paraml,Data,StandorPro,Name)    
             
 
 

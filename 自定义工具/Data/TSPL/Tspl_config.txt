@@ -3,7 +3,7 @@ GAP 2 mm,0 mm
 CLS 
 REFERENCE 40,40
 DENSITY 2
-TEXT 0 ,0,"1",0,1,1,"æµ‹è¯•æ‰“å°"
+TEXT 0 ,0,"1",0,1,1,"²âÊÔ´òÓ¡"
 PRINT 1,1
 =====
 SPEED 4
@@ -24,31 +24,31 @@ GAP 2 mm,0 mm
 CLS 
 DIRECTION 0,0
 DENSITY 4
-TEXT 150 ,20,"1",0,1,1,"æµ‹è¯•é•œåƒæ‰“å°1"
+TEXT 150 ,20,"1",0,1,1,"²âÊÔ¾µÏñ´òÓ¡1"
 PRINT 1,1
-
+=====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 DIRECTION 0,1
 DENSITY 4
-TEXT 150 ,20,"1",0,1,1,"æµ‹è¯•é•œåƒæ‰“å°2"
+TEXT 150 ,20,"1",0,1,1,"²âÊÔ¾µÏñ´òÓ¡2"
 PRINT 1,1
-
+=====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 DIRECTION 1,0
 DENSITY 4
-TEXT 150 ,20,"1",0,1,1,"æµ‹è¯•é•œåƒæ‰“å°3"
+TEXT 150 ,20,"1",0,1,1,"²âÊÔ¾µÏñ´òÓ¡3"
 PRINT 1,1
-
+=====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 DIRECTION 1,1
 DENSITY 4
-TEXT 150 ,20,"1",0,1,1,"æµ‹è¯•é•œåƒæ‰“å°4"
+TEXT 150 ,20,"1",0,1,1,"²âÊÔ¾µÏñ´òÓ¡4"
 PRINT 1,1
 
 SIZE 50 mm, 40 mm
@@ -60,31 +60,25 @@ SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 REFERENCE 40,40
-DENSITY 2
-TEXT 0 ,0,"1",0,1,1,"æµ‹è¯•æ‰“å°"
+DENSITY 4
+TEXT 0 ,0,"1",0,1,1,"ÆðÊ¼µã0¸ÄÎª40£¬40£¬Æ«ÒÆÁË5mm"
 PRINT 1,1
-
-SIZE 50 mm, 40 mm
-GAP 2 mm,0 mm
-CLS 
-REFERENCE 0,0
 =====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS
 DIRECTION 0,0
 SHIFT 60
-TEXT 0 ,0,"0",0,1,1,"æ–¹å‘0"
-TEXT 0 ,40,"0",0,1,1,"ç§»åŠ¨36"
+TEXT 0 ,0,"0",0,1,1,"·½Ïò0"
+TEXT 0 ,40,"0",0,1,1,"ÒÆ¶¯36"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 DIRECTION 0
 SHIFT 0
-TEXT 0 ,0,"0",0,1,1,"æ–¹å‘0"
-CLS
-TEXT 0 ,40,"0",0,1,1,"ç§»åŠ¨36"
+TEXT 0 ,0,"0",0,1,1,"·½Ïò0"
+TEXT 0 ,40,"0",0,1,1,"ÒÆ¶¯36"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -92,7 +86,7 @@ GAP 2 mm,0 mm
 CLS 
 REFERENCE 0,0
 DENSITY 4
-TEXT 0,0,"1",0,1,1,"FEED 348 èµ°çº¸å¼ ä¸€å¼ "
+TEXT 0,0,"1",0,1,1,"FEED 348 ×ßÖ½Ò»ÕÅ"
 PRINT 1,1
 
 FEED 348
@@ -101,7 +95,7 @@ SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 DENSITY 4
-TEXT 0,0,"1",0,1,1,"--å›žçº¸å‰ä½ç½®---"
+TEXT 0,0,"1",0,1,1,"--»ØÖ½ÕÅÇ°µÄÎ»ÖÃ--"
 PRINT 1,1
 
 BACKFEED 200
@@ -110,7 +104,7 @@ SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS 
 DENSITY 4
-TEXT 0,0,"1",0,1,1,"--å›žçº¸200çš„ä½ç½®,2cm---"
+TEXT 0,0,"1",0,1,1,"--»ØÖ½ÕÅºóµÄÎ»ÖÃ--"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -118,7 +112,7 @@ GAP 2 mm,0 mm
 DENSITY 2
 FORMFEED
 CLS 
-TEXT 0 ,40,"1",0,1,1,"å…ˆè¿›çº¸ä¸€å¼ ï¼Œåœ¨æ‰“å°æµ‹è¯•"
+TEXT 0 ,40,"1",0,1,1,"½øÖ½Ò»ÕÅ£¬ÔÚ´òÓ¡²âÊÔ"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -126,7 +120,7 @@ GAP 2 mm,0
 HOME
 CLS 
 BOX 1,1,360,65,12
-TEXT 35,25,"0",0,1,1,"HOMEå‘½ä»¤æµ‹è¯•"
+TEXT 35,25,"0",0,1,1,"HOMEÃüÁî²âÊÔ"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -143,9 +137,11 @@ GAP 2 mm,0 mm
 CLS 
 REFERENCE 40,40
 DENSITY 2
-TEXT 0 ,0,"1",0,1,1,"åˆ‡åˆ€æµ‹è¯•"
+TEXT 0 ,0,"1",0,1,1,"ÇÐµ¶²âÊÔ"
 PRINT 1,1
 CUT
+=====
+SELFTEST
 =====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0
@@ -165,13 +161,21 @@ BARCODE 90,200, "128M",100,2,0,2,2,"center"
 BARCODE 200,50, "128",100,3,0,2,2,"right"
 PRINT 1
 =====
+SIZE 4,1
+GAP 0,0
+DIRECTION 0,0
+REM *****WITHOUR OPTIONS*****
+CLS
+PDF417 10,10,400,100,0, "Without Options"
+PRINT 1,1
+=====
 SIZE 50 mm, 40 mm
 GAP 0,0
 DIRECTION 0,0
 CLS
 QRCODE 10,10,H,4,A,0,"ABCabc123"
 QRCODE 160,200,H,4,A,0,"123ABCabc"
-QRCODE 310,400,M,4,A,0,M2,"æµ‹è¯• ABCabc123"
+QRCODE 310,400,M,4,A,0,M2,"²âÊÔ ABCabc123"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -195,7 +199,7 @@ GAP 2 mm,0 mm
 CLS
 BOX 0,0,384,310,8
 PRINT 1,1
-
+=====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
 CLS
@@ -220,7 +224,7 @@ BAR 40,40,320,320
 ERASE 120,120,160,160
 PRINT 1,1
 =====
-SIZE 50 mm, 40 mm
+SIZE 4,2.5
 GAP 0,0
 DIRECTION 0,0
 CLS
@@ -233,23 +237,23 @@ GAP 2 mm,0 mm
 CLS 
 DIRECTION 0,0
 DENSITY 2
-TEXT 10,20,"0",0,1,1,"æµ‹è¯•FONT 0"
-TEXT 330,50,"1",90,1,1,"æµ‹è¯•FONT 1 90åº¦"
-TEXT 10,90,"2",0,1,1,"æµ‹è¯•FONT 2 "
-TEXT 10,120,"3",0,1,1,"æµ‹è¯•FONT 3"
-TEXT 10,150,"4",0,1,1,"æµ‹è¯•FONT 4"
-TEXT 300,200,"5",180,1,1,"æµ‹è¯•FONT 5 180åº¦"
-TEXT 10,220,"6",0,1,1,"æµ‹è¯•FONT 6"
-TEXT 10,250,"7",0,1,1,"æµ‹è¯•FONT 7"
-TEXT 340,290,"8",270,1,1,"æµ‹è¯•FONT 8 270åº¦"
+TEXT 10,20,"0",0,1,1,"²âÊÔFONT 0"
+TEXT 330,50,"1",90,1,1,"²âÊÔFONT 1 90¶È"
+TEXT 10,90,"2",0,1,1,"²âÊÔFONT 2 "
+TEXT 10,120,"3",0,1,1,"²âÊÔFONT 3"
+TEXT 10,150,"4",0,1,1,"²âÊÔFONT 4"
+TEXT 300,200,"5",180,1,1,"²âÊÔFONT 5 180¶È"
+TEXT 10,220,"6",0,1,1,"²âÊÔFONT 6"
+TEXT 10,250,"7",0,1,1,"²âÊÔFONT 7"
+TEXT 340,290,"8",270,1,1,"²âÊÔFONT 8 270¶È"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
 CLS 
 BOLD 0 
-TEXT 200,100,"0",0,1,1,"å­—ä½“"
+TEXT 200,100,"0",0,1,1,"×ÖÌå"
 BOLD 1 
-TEXT 200,150,"0",0,1,1,"å­—ä½“åŠ ç²—"
+TEXT 200,150,"0",0,1,1,"×ÖÌå¼Ó´Ö"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -260,8 +264,4 @@ SET COUNTER @1 1
 CLS
 TEXT 10,10, "3",0,1,1,@1
 PRINT 3,2
-=====
-
-=====
-
 =====
