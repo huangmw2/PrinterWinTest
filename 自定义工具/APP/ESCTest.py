@@ -412,7 +412,6 @@ class Esc_Test:
         Qrcode_data_hex =  ' '.join(format(byte, '02x') for byte in Qrcode_data)
 
         Send_pack = QrCode_Init+QrCode_width+QrCode_PrintDat+QrCode_Size+Qrcode_level+Qrcode_Datlen+Qrcode_data_hex
-        print(f"Sendpack = {Send_pack}")
         Qrcode_bytes_Data = bytes.fromhex(Send_pack)
         queue_handler.Print_QRCode(QrCodeData,int(QrCodeWidth),int(QrcodeSize),int(Codelevel),Qrcode_bytes_Data)
 

@@ -1,9 +1,19 @@
 import tkinter as tk
-from tkinter import ttk,  filedialog
+from tkinter import ttk,  filedialog, messagebox
 import win32print
+import win32api
+import win32ui
+import win32com.client
+import os
+from PIL import Image, ImageWin
+
 class Driver_Test:
     def __init__(self,parent):
 
+        if __name__ == "__main__":
+            self.root = parent
+            self.root.title("Driver测试")
+            self.root.geometry("700x500+600+300")
         self.printer_list=[]
         self.ImageDefault_path = "./test.bmp"
         self.WordDefault_path = "./text.docx"
@@ -120,7 +130,29 @@ class Driver_Test:
             self.ImagePath_enrty.insert(0,FilePath)
 
     def ImagePrintTest(self):
-        pass
+        file_path = self.ImagePath_enrty.get()
+        printer_name = self.Printer_entry.get()
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        # 打开图片
+        image = Image.open(file_path)
+        # 获取指定打印机设备上下文
+        hdc = win32ui.CreateDC()
+        hdc.CreatePrinterDC(printer_name)  # 使用打印机设备名称
+
+        # 开始打印任务
+        hdc.StartDoc("Python Print")
+        hdc.StartPage()
+
+        # 绘制位图
+        dib = ImageWin.Dib(image)
+        dib.draw(hdc.GetHandleOutput(), (0, 0, image.width, image.height))
+
+        # 结束打印任务
+        hdc.EndPage()
+        hdc.EndDoc()
+        hdc.DeleteDC()
 
     #打开word路径
     def OpenWordPath(self):
@@ -129,7 +161,22 @@ class Driver_Test:
             self.WordPath_entry.delete(0,tk.END)
             self.WordPath_entry.insert(0,FilePath)
     def WordPrintTest(self):
-        pass
+        file_path = self.WordPath_entry.get()
+        printer_name = self.Printer_entry.get()
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        try :
+            word = win32com.client.Dispatch("Word.Application")
+            doc = word.Documents.Open(file_path)
+            word.ActivePrinter = printer_name
+            doc.PrintOut()
+            doc.Close(False)
+            # 退出 Word
+            if 'word' in locals():
+                word.Quit()
+        except Exception as e:
+            messagebox.showerror("打印失败", f"打印时发生错误: {e}")
 
     #打开Pdf路径
     def OpenPdfPath(self):
@@ -138,7 +185,14 @@ class Driver_Test:
             self.PdfPath_entry.delete(0,tk.END)
             self.PdfPath_entry.insert(0,FilePath)
     def PdfPrintTest(self):
-        pass
+        file_path = self.PdfPath_entry.get()
+        printer_name = self.Printer_entry.get()
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        win32api.ShellExecute(
+            0, "print", file_path, f'/d:"{printer_name}"', ".", 0
+        )
     
     #打开Excel路径
     def OpenExcelPath(self):
@@ -147,8 +201,19 @@ class Driver_Test:
             self.ExcelPath_entry.delete(0,tk.END)
             self.ExcelPath_entry.insert(0,FilePath)
     def ExcelPrintTest(self):
-        pass
-
+        file_path = self.PdfPath_entry.get()
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        try :
+            excel = win32com.client.Dispatch("Excel.Application")
+            workbook = excel.Workbooks.Open(file_path)
+            sheet = workbook.Sheets(1)  # 选择第一个工作表
+            sheet.PrintOut()  # 打印当前工作表
+            workbook.Close(False)  # 不保存更改
+            excel.Application.Quit()
+        except Exception as e:
+            messagebox.showerror("打印失败", f"打印时发生错误: {e}")
     #打开PPT路径
     def OpenPPTPath(self):
         FilePath = filedialog.askopenfilename(title="选择PPT文件",filetypes=[("PPT Files","*.ppt;*.pptx")])
@@ -165,4 +230,17 @@ class Driver_Test:
             self.TXTPath_entry.delete(0,tk.END)
             self.TXTPath_entry.insert(0,FilePath)
     def TXTPrintTest(self):
-        pass
+        file_path = self.TXTPath_entry.get()
+        printer_name = self.Printer_entry.get()
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        win32api.ShellExecute(
+            0, "print", file_path, f'/d:"{printer_name}"', ".", 0
+        )
+
+if __name__ == "__main__":
+
+    root = tk.Tk()
+    app = Driver_Test(root)
+    root.mainloop()

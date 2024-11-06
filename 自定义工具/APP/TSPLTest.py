@@ -126,7 +126,11 @@ class Tspl_Test:
         if self.stop_flag == False:
             Data = self.textboxs[self.index].get("1.0", tk.END) 
             if self.is_valid_data(Data):
-                print(Data)
+                Data = bytes.fromhex(Data)
+            else :
+                # 使用正则表达式，只替换单独的 \n 为 \r\n
+                Data = re.sub(r'(?<!\r)\n', '\r\n', Data)
+
             log = "发送第{}条,TSPL数据".format(self.index+1)
             queue_handler.write_to_queue(Data,log)
             self.index += 1 
@@ -151,6 +155,11 @@ class Tspl_Test:
             messagebox.showerror("错误","输入的测试条目不对")
             return 
         Data = self.textboxs[Number-1].get("1.0", tk.END) 
+        if self.is_valid_data(Data):
+            Data = bytes.fromhex(Data)
+        else :
+            # 使用正则表达式，只替换单独的 \n 为 \r\n
+            Data = re.sub(r'(?<!\r)\n', '\r\n', Data)
         log = "发送第{}条,TSPL数据".format(Number)
         queue_handler.write_to_queue(Data,log)  
 
@@ -171,7 +180,7 @@ class Tspl_Test:
             return 
         with open(file_path, 'r', encoding='cp936',errors='replace') as file:
             content = file.read()
-            self.text_data_list = content.split('=====')
+            self.text_data_list = content.split('\n=====\n')
             # 清除可能的空字符串
             self.text_data_list = [data.strip() for data in self.text_data_list if data.strip()]    
 

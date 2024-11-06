@@ -75,10 +75,11 @@ PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
 GAP 2 mm,0 mm
+CLS
 DIRECTION 0
 SHIFT 0
 TEXT 0 ,0,"0",0,1,1,"方向0"
-TEXT 0 ,40,"0",0,1,1,"移动36"
+TEXT 0 ,40,"0",0,1,1,"移动0"
 PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
@@ -140,6 +141,11 @@ DENSITY 2
 TEXT 0 ,0,"1",0,1,1,"切刀测试"
 PRINT 1,1
 CUT
+
+SIZE 50 mm, 40 mm
+GAP 2 mm,0 mm
+CLS 
+REFERENCE 0,0
 =====
 SELFTEST
 =====
@@ -160,14 +166,6 @@ BARCODE 10,50, "128",100,1,0,2,2,"left"
 BARCODE 90,200, "128M",100,2,0,2,2,"center"
 BARCODE 200,50, "128",100,3,0,2,2,"right"
 PRINT 1
-=====
-SIZE 4,1
-GAP 0,0
-DIRECTION 0,0
-REM *****WITHOUR OPTIONS*****
-CLS
-PDF417 10,10,400,100,0, "Without Options"
-PRINT 1,1
 =====
 SIZE 50 mm, 40 mm
 GAP 0,0
