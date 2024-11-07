@@ -274,13 +274,14 @@ class MainUI:
         self.Net_test = Netword_Test(self.notebook)
         self.notebook.add(self.Net_test.frame,text="网络/蓝牙测试")
 
-        #RAM测试
-        self.Ram_test = RAM_Test(self.notebook)
-        self.notebook.add(self.Ram_test.frame,text="RAM 测试")
 
         #参数设置
         self.Paras_set = Paras_Set(self.notebook)
         self.notebook.add(self.Paras_set.frame,text="参数设置")
+
+        #自定义参数设置
+        self.Ram_test = RAM_Test(self.notebook)
+        self.notebook.add(self.Ram_test.frame,text="自定义参数设置")
 
         #读写队列
         global Global_Comtype  # 引用全局变量

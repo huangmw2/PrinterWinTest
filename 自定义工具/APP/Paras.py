@@ -662,8 +662,8 @@ class Paras_Set:
     def PrintProcotol_Set(self):
         ChangeData = {
             'ESC': "82 00",
-            'TSPL': "82 01",   
-            'CPCL': "82 02",
+            'TSPL': "82 02",   
+            'CPCL': "82 01",
             'JPL': "82 03",         
         }
         Command = 0x92

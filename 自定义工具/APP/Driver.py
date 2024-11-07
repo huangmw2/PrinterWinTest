@@ -91,13 +91,18 @@ class Driver_Test:
         #ppt路径选择及设置按钮
         self.label = tk.Label(self.frame,text="PPT路径:",font=("仿宋",12))
         self.label.place(x=5,y=240)
+        self.label.config(state='disabled') 
         self.PPTPath_entry = tk.Entry(self.frame,width=50)
         self.PPTPath_entry.place(x=90,y=240)
+        self.PPTPath_entry.config(state='disabled') 
         self.OpenPPT_button = tk.Button(self.frame, text="打开",width=6,command=self.OpenPPTPath,font=("仿宋",12))
         self.OpenPPT_button.place(x=460,y=240)
+        self.OpenPPT_button.config(state='disabled') 
         self.PPTTest_button = tk.Button(self.frame, text="测试",width=6,command=self.PPTPrintTest,font=("仿宋",12))
         self.PPTTest_button.place(x=520,y=240)
-        self.PPTPath_entry.insert(0,self.PPTDefault_path)  
+        self.PPTTest_button.config(state='disabled') 
+        self.PPTPath_entry.insert(0,self.PPTDefault_path) 
+        self.PPTPath_entry.config(state='disabled') 
 
         #Txt路径选择及设置按钮
         self.label = tk.Label(self.frame,text="Txt路径:",font=("仿宋",12))
@@ -201,7 +206,7 @@ class Driver_Test:
             self.ExcelPath_entry.delete(0,tk.END)
             self.ExcelPath_entry.insert(0,FilePath)
     def ExcelPrintTest(self):
-        file_path = self.PdfPath_entry.get()
+        file_path = self.ExcelPath_entry.get()
         if not os.path.exists(file_path):
             messagebox.showerror("错误", f"文件 {file_path} 不存在！")
             return
@@ -221,8 +226,26 @@ class Driver_Test:
             self.PPTPath_entry.delete(0,tk.END)
             self.PPTPath_entry.insert(0,FilePath)
     def PPTPrintTest(self):
-        pass
+        file_path = self.PPTPath_entry.get()
+        printer_name = self.Printer_entry.get()
+        win32print.SetDefaultPrinter(printer_name)
 
+        if not os.path.exists(file_path):
+            messagebox.showerror("错误", f"文件 {file_path} 不存在！")
+            return
+        # 创建 PowerPoint 应用程序对象
+        try :
+            powerpoint = win32com.client.Dispatch("PowerPoint.Application")
+            powerpoint.Visible = 1  # 使 PowerPoint 应用程序可见
+
+            # 打开 PPT 文件
+            presentation = powerpoint.Presentations.Open(file_path, WithWindow=False)
+            presentation.PrintOut()
+            presentation.Close()
+            powerpoint.Quit()
+        except Exception as e:
+            print(f"e={e}")
+            messagebox.showerror("打印失败", f"打印时发生错误: {e}")
     #打开TXT路径
     def OpenTXTPath(self):
         FilePath = filedialog.askopenfilename(title="选择Txt文件",filetypes=[("Txt Files","*.txt")])
