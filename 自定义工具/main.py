@@ -13,6 +13,8 @@ from APP.Paras import Paras_Set
 from APP.Usbcom import Comm_class
 from APP.Queue import queue_handler
 from APP.Log import setup_logging, Rtn_logmessage,log_message, Clear_logfile
+from APP.Config import Config_Data
+
 from tkinter import messagebox
 import logging
 

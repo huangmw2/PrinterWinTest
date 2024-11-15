@@ -38,6 +38,7 @@ class Dll_Init:
         APP_DIR = os.getcwd()
        # MAIN_DIR = os.path.dirname(APP_DIR)
         DLL_Name = r"DLL\CsnPrinterLibs.dll"
+
         self.Dll_path = os.path.join(APP_DIR, DLL_Name)
         if os.path.exists(self.Dll_path):
             self.Dll_Flag = 1

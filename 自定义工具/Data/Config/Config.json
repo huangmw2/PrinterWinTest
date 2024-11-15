@@ -22,5 +22,11 @@
     "TSPL_delay": "3000",
     "TSPL_Loop": "./test.pptx",
     "TSPL_Width": "50",
-    "TSPL_high": "40"
+    "TSPL_high": "40",
+    "Diy_Paras" : {
+        "Print_Bitmap":"1c 70 01 00",   
+        "Pull_Switch": "8701",
+        "DHCP_Switch": "8c01"
+    },
+    "debug": true
 }
