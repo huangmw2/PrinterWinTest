@@ -2,7 +2,7 @@
     "Serial_number": "COM3",
     "Baud_rate": "115200",
     "Check_code": "None",
-    "EthIp": "192.168.0.87",
+    "EthIp": "192.168.0.60",
     "EthPort": "9100",
     "Debug": true,
     "Speed_PaperSize": "3",
@@ -23,10 +23,10 @@
     "TSPL_Loop": "./test.pptx",
     "TSPL_Width": "50",
     "TSPL_high": "40",
-    "Diy_Paras" : {
-        "Print_Bitmap":"1c 70 01 00",   
-        "Pull_Switch": "8701",
-        "DHCP_Switch": "8c01"
+    "Diy_Paras": {
+        "打印位图": "1c 70 01 00",
+        "开启拽纸侦测": "8701",
+        "开启DHCP": "8c01"
     },
     "debug": true
 }

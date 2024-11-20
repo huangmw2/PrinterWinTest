@@ -3,7 +3,10 @@ import os
 if __name__ == "__main__":
     from Log import log_message  
 else :
-    from APP.Log import log_message 
+    try:
+        from APP.Log import log_message 
+    except ImportError:
+        from Log import log_message 
 import logging
 
 class Config_paras:
@@ -15,13 +18,21 @@ class Config_paras:
 
         if os.path.exists(self.ConfigPath):
             with open(self.ConfigPath, 'r', encoding='utf-8') as file:
-                self.Config_data = json.load(file)
+                try:
+                    self.Config_data = json.load(file)
+                except Exception as e:
+                    log = "配置文件数据错乱，错误信息：{}".format(e)
+                    log_message(log,logging.ERROR)
+                    self.Config_data = None
         else :
             log = "文件:{}不存在。".format(self.ConfigPath)
             log_message(log,logging.ERROR)
     
     def Get_Data(self):
         return self.Config_data
+
+    def modify_all_data(self,data):
+        self.Config_data = data
 
     def Modify_Data(self,*args, value=None):
         if not self.Config_data:
@@ -109,7 +120,7 @@ class Config_paras:
             return False
         try:
             with open(self.ConfigPath, 'w', encoding='utf-8') as f:
-                json.dump(self.ConfigPath, f, ensure_ascii=False, indent=4)
+                json.dump(self.Config_data, f, ensure_ascii=False, indent=4)
                 print(f"配置已成功保存到 {self.ConfigPath}")
                 return True
         except Exception as e:

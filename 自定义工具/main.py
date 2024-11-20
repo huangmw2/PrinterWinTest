@@ -25,10 +25,13 @@ class StartUpWindow:
         self.root = root
         self.root.title("测试部自研工具")
         self.root.geometry("700x500+600+300")
+        #绑定关闭窗口
+        self.root.protocol("WM_DELETE_WINDOW", self.mainwindows)
 
         #初始化log信息
         setup_logging()
 
+        self.ConfigData = Config_Data.Get_Data()
         # 创建主框架
         self.frame = tk.Frame(self.root, bd=2, relief=tk.GROOVE)
         self.frame.pack(fill=tk.BOTH, expand=True)
@@ -53,7 +56,7 @@ class StartUpWindow:
         self.Serialbaud_entry = ttk.Combobox(self.CommOption_frame, width=8, values=['2400', '4800', '9600', '19200', '38400', '57600',
                                                                                        '115200', '230400'])  # 根据实际情况修改串口号列表
         self.Serialbaud_entry.place(x=250,y=10)
-        self.Serialbaud_entry.set('115200')
+        
 
         self.SerialCheck = tk.Label(self.CommOption_frame, text="校验:")
         self.SerialCheck.place(x=360,y=10)  
@@ -80,7 +83,12 @@ class StartUpWindow:
         self.PortNum_label = tk.Label(self.CommOption_frame,text="端口号",font=("仿宋",12))
         self.PortNum_label.place(x=250,y=70)   
         self.PortNum_entry = tk.Entry(self.CommOption_frame,width=18)
-        self.PortNum_entry.place(x=310,y=70)    
+        self.PortNum_entry.place(x=310,y=70)   
+        #初始化网口地址
+        if self.ConfigData != None and self.ConfigData["EthIp"]:
+            self.EthernetIp.insert(0,self.ConfigData["EthIp"])
+        if self.ConfigData != None and self.ConfigData["EthPort"]:
+            self.PortNum_entry.insert(0,self.ConfigData["EthPort"])
         #并口
         self.LPTComm = tk.Radiobutton(self.CommOption_frame, text="LPT", variable=self.Comm_option, value="LPT")
         self.LPTComm.place(x=10,y=100)     
@@ -236,6 +244,15 @@ class StartUpWindow:
         if file_path:  # 用户选择了文件路径
             with open(file_path, 'w') as file:
                 file.write(content)  # 将内容写入文件
+    def mainwindows(self):
+        #保存网口信息
+        ret = False
+        if self.ConfigData :
+            ret = Config_Data.Modify_Data("EthIp",value=self.EthernetIp.get())
+            ret &= Config_Data.Modify_Data("EthPort",value=self.PortNum_entry.get())
+            if ret:
+                Config_Data.Save_Data()
+        self.root.destroy()
 
 class MainUI:
     def __init__(self, root,startup_window,startup_class):
