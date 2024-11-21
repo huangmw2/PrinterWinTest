@@ -6,7 +6,10 @@ import struct
 if __name__ == "__main__":
     from Queue import queue_handler
 else :
-    from APP.Queue import queue_handler
+    try:
+        from APP.Queue import queue_handler
+    except ImportError:
+        from Queue import queue_handler
 
 class button_fun(Enum):
     BAUD_RATE_FUN = 0
@@ -805,8 +808,6 @@ class Paras_Set:
 
         self.Send_Packaging(Command,Paramh,Paraml,Data,StandorPro,Name)    
             
-
-
 if __name__ == "__main__":
     root = tk.Tk()
     app = Paras_Set(root)

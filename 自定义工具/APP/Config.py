@@ -1,5 +1,6 @@
 import json
 import os
+from tkinter import messagebox
 if __name__ == "__main__":
     from Log import log_message  
 else :
@@ -112,7 +113,8 @@ class Config_paras:
                     log_message(log,logging.DEBUG)
                     return True
             except Exception as e:
-                print(f"添加字段过程中出现异常: {e}")
+                log = "添加字段过程中出现异常:{}".format(e)
+                log_message(log,logging.ERROR)
                 return False
 
     def Save_Data(self):
@@ -121,10 +123,9 @@ class Config_paras:
         try:
             with open(self.ConfigPath, 'w', encoding='utf-8') as f:
                 json.dump(self.Config_data, f, ensure_ascii=False, indent=4)
-                print(f"配置已成功保存到 {self.ConfigPath}")
                 return True
         except Exception as e:
-            print(f"保存数据时出现错误: {e}")
+            messagebox.showerror("错误", "保存json参数数据失败")
             return False
         
 Config_Data = Config_paras()
