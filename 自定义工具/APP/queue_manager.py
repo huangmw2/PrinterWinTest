@@ -4,11 +4,11 @@ import queue
 import time 
 import logging
 try:
-    from APP.Usbcom import Comm_class  # 绝对导入
-    from APP.Log import log_message
+    from APP.communication import Comm_class  # 绝对导入
+    from APP.logger import log_message
 except ImportError:
-    from Usbcom import Comm_class  # 相对导入
-    from Log import log_message  # 相对导入    
+    from communication import Comm_class  # 相对导入
+    from logger import log_message  # 相对导入    
 
 max_size_queue = 100
 Queue_Comtype = None

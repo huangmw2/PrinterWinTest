@@ -5,9 +5,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 if __name__ == "__main__":
-    from Queue import queue_handler
+    from queue_manager import queue_handler
 else :
-    from APP.Queue import queue_handler
+    from APP.queue_manager import queue_handler
 
 class Tspl_Test:
     def __init__(self,parent):

@@ -2,12 +2,12 @@ import json
 import os
 from tkinter import messagebox
 if __name__ == "__main__":
-    from Log import log_message  
+    from logger import log_message  
 else :
     try:
-        from APP.Log import log_message 
+        from APP.logger import log_message 
     except ImportError:
-        from Log import log_message 
+        from logger import log_message 
 import logging
 
 class Config_paras:

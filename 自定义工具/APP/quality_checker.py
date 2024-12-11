@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 import os
-from APP.Queue import queue_handler  # 自己调用
+from APP.queue_manager import queue_handler  # 自己调用
 
     
 

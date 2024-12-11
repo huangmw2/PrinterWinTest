@@ -1,22 +1,26 @@
-# timer_app.py
-import tkinter as tk
-from tkinter import filedialog
-from tkinter import ttk
-from APP.SpeedTest import Speed_Test
-from APP.PrintQualityTest import Quality_Test
-from APP.Driver import Driver_Test
-from APP.TSPLTest import Tspl_Test
-from APP.ESCTest import Esc_Test
-from APP.NetworkTest import Netword_Test
-from APP.RAMTest import RAM_Test
-from APP.Paras import Paras_Set
-from APP.Usbcom import Comm_class
-from APP.Queue import queue_handler
-from APP.Log import setup_logging, Rtn_logmessage,log_message, Clear_logfile
-from APP.Config import Config_Data
 
-from tkinter import messagebox
+#从库导入
 import logging
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
+#从其他模块导入
+from APP.speed_test import Speed_Test
+from APP.quality_checker import Quality_Test
+from APP.printer_drive import Driver_Test
+from APP.tspl_command import Tspl_Test
+from APP.esc_command import Esc_Test
+from APP.network_utils import Netword_Test
+from APP.data_downloader import RAM_Test
+from APP.param_config import Paras_Set
+from APP.communication import Comm_class
+from APP.queue_manager import queue_handler
+from APP.logger import setup_logging, Rtn_logmessage,log_message, Clear_logfile
+from APP.user_data import Config_Data
+
+
+
 
 Global_Comtype = None
 
@@ -322,7 +326,6 @@ class MainUI:
 
 
 if __name__ == "__main__":
-
     root = tk.Tk()
     app = StartUpWindow(root)
     root.mainloop()

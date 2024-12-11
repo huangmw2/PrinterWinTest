@@ -1,14 +1,14 @@
 # RAM Test
-import tkinter as tk
-from tkinter import ttk
 import time
 import struct
+import tkinter as tk
+from tkinter import ttk
 if __name__ == "__main__":
-    from Config import Config_Data
-    from Queue import queue_handler
+    from user_data import Config_Data
+    from queue_manager import queue_handler
 else :
-    from APP.Config import Config_Data
-    from APP.Queue import queue_handler
+    from APP.user_data import Config_Data
+    from APP.queue_manager import queue_handler
 
 class RAM_Test:
     def __init__(self,parent):

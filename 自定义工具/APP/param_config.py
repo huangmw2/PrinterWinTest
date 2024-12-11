@@ -4,12 +4,12 @@ from tkinter import ttk
 from enum import Enum
 import struct
 if __name__ == "__main__":
-    from Queue import queue_handler
+    from queue_manager import queue_handler
 else :
     try:
-        from APP.Queue import queue_handler
+        from APP.queue_manager import queue_handler
     except ImportError:
-        from Queue import queue_handler
+        from queue_manager import queue_handler
 
 class button_fun(Enum):
     BAUD_RATE_FUN = 0

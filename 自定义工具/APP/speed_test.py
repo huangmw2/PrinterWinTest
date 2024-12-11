@@ -7,16 +7,16 @@ import os
 import logging
 
 try:
-    from APP.Usbcom import Comm_class  # 绝对导入
+    from APP.communication import Comm_class  # 绝对导入
 except ImportError:
-    from Usbcom import Comm_class  # 相对导入
+    from communication import Comm_class  # 相对导入
 
 if __name__ == "__main__":
-    from Queue import queue_handler
-    from Log import log_message  
+    from queue_manager import queue_handler
+    from logger import log_message  
 else :
-    from APP.Queue import queue_handler
-    from APP.Log import log_message 
+    from APP.queue_manager import queue_handler
+    from APP.logger import log_message 
 
 class Speed_Test:
     def __init__(self, parent):   

@@ -7,11 +7,11 @@ import tkinter as tk
 from tkinter import ttk,filedialog,messagebox
 from PIL import Image, ImageTk  # 如果没有安装PIL，可以通过 pip install pillow 安装
 if __name__ == "__main__":
-    from Queue import queue_handler
-    from Log import log_message  
+    from queue_manager import queue_handler
+    from logger import log_message  
 else :
-    from APP.Queue import queue_handler
-    from APP.Log import log_message 
+    from APP.queue_manager import queue_handler
+    from APP.logger import log_message 
 import logging
 
 class Esc_Test:

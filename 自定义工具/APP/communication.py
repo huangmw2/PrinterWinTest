@@ -1,16 +1,14 @@
-import usb.core
-import usb.util
 import ctypes
 import os
 import serial
-import serial.tools.list_ports
 import logging
 import time
 import socket
+import serial.tools.list_ports
 try:
-    from APP.Log import log_message
+    from APP.logger import log_message
 except ImportError:
-    from Log import log_message
+    from logger import log_message
 # 打印机的Vendor ID和Product ID，需要根据实际打印机的设备进行修改
 VENDOR_ID =  0x0FE6
 PRODUCT_ID = 0x811E
