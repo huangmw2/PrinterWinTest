@@ -2,7 +2,7 @@
     "Serial_number": "COM3",
     "Baud_rate": "115200",
     "Check_code": "None",
-    "EthIp": "192.168.0.60",
+    "EthIp": "192.168.8.176",
     "EthPort": "9100",
     "Debug": true,
     "Speed_PaperSize": "3",
@@ -26,7 +26,9 @@
     "Diy_Paras": {
         "开启拽纸": "8701",
         "开启DHCP": "8c01",
-        "速度设置": "8300"
+        "速度设置": "8300",
+        "吐纸回收关": "0000",
+        "吐纸回收开": "0001"
     },
     "debug": true
 }

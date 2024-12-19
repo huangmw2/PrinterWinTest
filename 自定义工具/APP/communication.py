@@ -74,7 +74,7 @@ class Dll_Init:
         self.mylib.Pos_ImagePrint.argtypes = [ctypes.c_wchar_p, ctypes.c_int, ctypes.c_int]
         self.mylib.Pos_ImagePrint.restype = ctypes.c_bool       
     #列出USB接口
-    def List_UsbCom(self):
+    def list_usb_devices(self):
         if not self.Dll_Flag :
             return []
         ctypes.memset(self.buffer_usb, 0, self.buffer_size)
@@ -139,9 +139,9 @@ class Dll_Init:
             self.Port_result = self.mylib.Port_ClosePort(self.res_buffer) 
             self.Port_result = 0 
             return 1
-
+    
     #列出串口接口
-    def List_SerialCom(self):
+    def list_serial_com(self):
         if not self.Dll_Flag :
             ports = serial.tools.list_ports.comports()
             available_ports = [port.device for port in ports]
@@ -265,14 +265,14 @@ class Dll_Init:
 Comm_class = Dll_Init()
 if __name__ == "__main__":
 
-    Usb_devices = Comm_class.List_UsbCom()
+    Usb_devices = Comm_class.list_usb_devices()
 
     if  Usb_devices:
         print("找到的USB设备:", Usb_devices)
     else :
         print("没有找到设备")
 
-    Comm_class.List_SerialCom()
+    Comm_class.list_serial_com()
     Comm_class.Open_UsbCom()
     
 

@@ -4,10 +4,10 @@ import struct
 import tkinter as tk
 from tkinter import ttk
 if __name__ == "__main__":
-    from user_data import Config_Data
+    from user_data import ConfigParas
     from queue_manager import queue_handler
 else :
-    from APP.user_data import Config_Data
+    from APP.user_data import ConfigParas
     from APP.queue_manager import queue_handler
 
 class RAM_Test:
@@ -18,7 +18,8 @@ class RAM_Test:
             self.root = parent
             self.root.title("自定义参数设置")
             self.root.geometry("700x500+600+300")
-        self.ConfigData = Config_Data.Get_Data()
+        self.configparas_instance = ConfigParas()
+ 
 
         self.Fun_frame = ttk.LabelFrame(self.frame,text="功能区")
         self.Fun_frame.place(x=0,y=0,width=350,height=400)
@@ -51,8 +52,9 @@ class RAM_Test:
         self.Diy_paras()
 
     def Diy_paras(self):
-        Diy_Dat = self.ConfigData["Diy_Paras"]
-        Diy_Cnt = len(self.ConfigData["Diy_Paras"])
+        config_data = self.configparas_instance.get_config_data()
+        Diy_Dat = config_data["Diy_Paras"]
+        Diy_Cnt = len(config_data["Diy_Paras"])
         # 获取第一个节点的名称和值
         for i in range(Diy_Cnt):
             key = list(Diy_Dat.keys())[i]  # 获取第一个键
@@ -98,9 +100,9 @@ class RAM_Test:
             if not key and not value:
                 continue
             Updated_data[key] = value  # 将键值对存入字典    
-        ret = Config_Data.Modify_Data("Diy_Paras",value=Updated_data)
+        ret = self.configparas_instance.Modify_Data("Diy_Paras",value=Updated_data)
         if ret == True:
-            Config_Data.Save_Data()
+            self.configparas_instance.Save_Data()
     #Data Packet 发送的数据包 (组包)
     def Send_Packaging(self,_Command,Data=None,Name=" "): 
         #包头 + 起始标志位

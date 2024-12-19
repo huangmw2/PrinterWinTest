@@ -16,9 +16,9 @@ from APP.data_downloader import RAM_Test
 from APP.param_config import Paras_Set
 from APP.communication import Comm_class
 from APP.queue_manager import queue_handler
-from APP.logger import setup_logging, Rtn_logmessage,log_message, Clear_logfile
-from APP.user_data import Config_Data
-
+from APP.logger import logger_init, Rtn_logmessage,log_message, Clear_logfile
+from APP.user_data import ConfigParas
+from APP.globals import CONFIG
 
 
 
@@ -26,95 +26,150 @@ Global_Comtype = None
 
 class StartUpWindow:
     def __init__(self, root):
+        '''
+            Args:
+                self: 当前StartUpWindow 对象的实例
+                root:  tk.Tk() UI窗口的根对象
+        '''
         self.root = root
-        self.root.title("测试部自研工具")
-        self.root.geometry("700x500+600+300")
-        #绑定关闭窗口
+        self.root.title(CONFIG['setup_windows']['win_title'])
+        self.root.geometry(CONFIG['setup_windows']['win_geometry'])
         self.root.protocol("WM_DELETE_WINDOW", self.mainwindows)
 
-        #初始化log信息
-        setup_logging()
+        '''
+            初始化数据:
+            1_logger_init :log 初始化
+            2_configparas_instance 配置信息实例获取
+        '''
+        logger_init()                                       #初始化log对象
+        self.configparas_instance = ConfigParas()           #创建配置类的实例
 
-        self.ConfigData = Config_Data.Get_Data()
-        # 创建主框架
-        self.frame = tk.Frame(self.root, bd=2, relief=tk.GROOVE)
-        self.frame.pack(fill=tk.BOTH, expand=True)
+        '''
+            main_frame: 根组件
+            comm_option_frame: 通信区域组件
+            comm_type : 选通信类型的组件
+        '''
+        self.main_frame = tk.Frame(self.root, bd=2, relief=tk.GROOVE)
+        self.main_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.CommOption_frame = ttk.LabelFrame(self.frame,text="选择通讯方式")
-        self.CommOption_frame.place(x=0,y=5,width=700,height=260)
-        self.Comm_option = tk.StringVar()
-        self.Comm_option.set("USB")
-        #串口
-        self.serial_devices = Comm_class.List_SerialCom()
-        self.SerialComm = tk.Radiobutton(self.CommOption_frame, text="串口", variable=self.Comm_option, value="串口")
-        self.SerialComm.place(x=10,y=10)
-        self.SerialNum_entry = ttk.Combobox(self.CommOption_frame, width=10,state='readonly')  # 根据实际情况修改串口号列表
-        self.SerialNum_entry.place(x=80,y=10)
-        self.SerialNum_entry['values'] = self.serial_devices
-        if  self.serial_devices:
-            self.SerialNum_entry.set(self.serial_devices[0])
-        self.SerialNum_entry.bind("<Button-1>", self.refresh_serial_devices)
+        self.comm_option_frame = ttk.LabelFrame(self.main_frame,text=CONFIG['setup_windows']['comm_option_name'])
+        self.set_frame_position(self.comm_option_frame,"place",*CONFIG['setup_windows']['comm_option_position'])
+        self.comm_type = tk.StringVar()
+        self.comm_type.set("USB")
 
-        self.Serial_baud_rate = tk.Label(self.CommOption_frame, text="波特率:")
-        self.Serial_baud_rate.place(x=200,y=10)  
-        self.Serialbaud_entry = ttk.Combobox(self.CommOption_frame, width=8, values=['2400', '4800', '9600', '19200', '38400', '57600',
-                                                                                       '115200', '230400'])  # 根据实际情况修改串口号列表
-        self.Serialbaud_entry.place(x=250,y=10)
+        '''
+            串口:
+            1)serial_radiobutton: 串口选择按钮组件
+            2)serial_port_combobox: 串口端口号列表组件
+            3)serial_baud_rate_label: 波特率label组件
+            4)serial_baud_rate_entry: 波特率entry组件
+            5)serial_parity_label : 校验方式label组件
+            6)serial_parity_entry : 校验方式的entry组件
+        '''
+        #1)
+        self.serial_port_lists = Comm_class.list_serial_com()
+        self.serial_radiobutton = tk.Radiobutton(self.comm_option_frame, text=CONFIG['setup_windows']['serial_radiobutton_name'], variable=self.comm_type, value="串口")
+        self.set_frame_position(self.serial_radiobutton,"place",*CONFIG['setup_windows']['serial_radiobutton_position'])
+        #2)
+        self.serial_port_combobox = ttk.Combobox(self.comm_option_frame, width=10,state='readonly')
+        self.set_frame_position(self.serial_port_combobox,"place",*CONFIG['setup_windows']['serial_port_combobox_position'])
+        self.serial_port_combobox['values'] = self.serial_port_lists
+        if  self.serial_port_lists:
+            self.serial_port_combobox.set(self.serial_port_lists[0])
+        self.serial_port_combobox.bind("<Button-1>", self.refresh_serial_port_lists)
+        #3)
+        self.serial_baud_rate_label = tk.Label(self.comm_option_frame, text=CONFIG['setup_windows']['baud_rate_name']) 
+        self.set_frame_position(self.serial_baud_rate_label,"place",*CONFIG['setup_windows']['baud_rate_position'])
+        #4)
+        self.serial_baud_rate_entry = ttk.Combobox(self.comm_option_frame, width=8, values=CONFIG['setup_windows']['baud_rate_value'])
+        self.set_frame_position(self.serial_baud_rate_entry,"place",*CONFIG['setup_windows']['baud_rate_entry_positiopn'])
+        self.serial_baud_rate_entry.set(CONFIG['setup_windows']['baud_rate_default_value'])
+        #5)
+        self.serial_parity_label = tk.Label(self.comm_option_frame, text=CONFIG['setup_windows']['serial_parity_name'])
+        self.set_frame_position(self.serial_parity_label,"place",*CONFIG['setup_windows']['serial_parity_name_positiopn'])  
+        #6)
+        self.serial_parity_entry = ttk.Combobox(self.comm_option_frame, width=8, values=CONFIG['setup_windows']['serial_parity_values'])  # 根据实际情况修改串口号列表
+        self.set_frame_position(self.serial_parity_entry,"place",*CONFIG['setup_windows']['serial_parity_entry_positiopn']) 
+        self.serial_parity_entry.set(CONFIG['setup_windows']['serial_parity_default_values'])
+
+        '''
+            USB:
+            1)usb_radiobutton: USB选择按钮组件
+            2)usb_device_combobox: usb设备列表组件
+        '''
+        #1)
+        self.usb_device_list = Comm_class.list_usb_devices()
+        self.usb_radiobutton = tk.Radiobutton(self.comm_option_frame, text=CONFIG['setup_windows']['usb_radiobutton_name'], variable=self.comm_type, value="USB")
+        self.set_frame_position(self.usb_radiobutton,"place",*CONFIG['setup_windows']['usb_radiobutton_position'])
+        #2)
+        self.usb_device_combobox = ttk.Combobox(self.comm_option_frame, width=80)
+        self.usb_device_combobox['values'] = self.usb_device_list
+        if  self.usb_device_list:
+            self.usb_device_combobox.set(self.usb_device_list[0])
+        self.set_frame_position(self.usb_device_combobox,"place",*CONFIG['setup_windows']['usb_device_combobox_position'])
+        self.usb_device_combobox.bind("<Button-1>", self.refresh_usb_devices)
+
+        '''
+            网口：
+            variable:
+                eth_ip_value:  存储到配置文件的Ip数据
+                eth_port_value: 存储到配置文件的port数据
+            1)eth_radiobutton: 以太网选择按钮组件
+            2)eth_ip_entry: 以太网ip 列表entry组件
+            3)eth_port_label: 以太网port名称的lable组件
+            3)eth_port_entry: 以太网port 列表entry组件
+        '''
+        #1）
+        self.eth_radiobutton = tk.Radiobutton(self.comm_option_frame, text=CONFIG['setup_windows']['eth_radiobutton_name'], variable=self.comm_type, value="网口")
+        self.set_frame_position(self.eth_radiobutton,"place",*CONFIG['setup_windows']['eth_radiobutton_position'])    
+        #2）
+        self.eth_ip_entry = tk.Entry(self.comm_option_frame,width=18)
+        self.set_frame_position(self.eth_ip_entry,"place",*CONFIG['setup_windows']['eth_ip_entry_position'])    
+        #3)
+        self.eth_port_label = tk.Label(self.comm_option_frame,text=CONFIG['setup_windows']['eth_port_name'],font=("仿宋",12))
+        self.set_frame_position(self.eth_port_label,"place",*CONFIG['setup_windows']['eth_port_name_position'])     
+        #4)
+        self.eth_port_entry = tk.Entry(self.comm_option_frame,width=18)
+        self.set_frame_position(self.eth_port_entry,"place",*CONFIG['setup_windows']['eth_port_entry_position'])    
         
+        eth_ip_value = self.configparas_instance.get_config_item("EthIp")
+        eth_port_value = self.configparas_instance.get_config_item("EthPort")
+        if eth_ip_value and eth_port_value:
+            self.eth_ip_entry.insert(0,eth_ip_value)
+            self.eth_port_entry.insert(0,eth_port_value)
+            
+        '''
+            并口: 暂时未实现并口
+            1)lpt_radiobutton: 并口选择按钮组件
+            2)lpt_device_entry: 并口设备列表entry组件
+        '''
+        #1）
+        self.lpt_radiobutton = tk.Radiobutton(self.comm_option_frame, text=CONFIG['setup_windows']['lpt_radiobutton_name'], variable=self.comm_type, value="LPT")
+        self.set_frame_position(self.lpt_radiobutton,"place",*CONFIG['setup_windows']['lpt_radiobutton_position'])  
+        #2）
+        self.lpt_device_entry = ttk.Combobox(self.comm_option_frame,width=18,values=['null'])
+        self.set_frame_position(self.lpt_device_entry,"place",*CONFIG['setup_windows']['lpt_entry_position'])  
 
-        self.SerialCheck = tk.Label(self.CommOption_frame, text="校验:")
-        self.SerialCheck.place(x=360,y=10)  
+        '''
+            按钮：
+            self.open_comm_button：打开通信端口按钮；
+            self.close_comm_button：关闭通信端口按钮；
+            self.func_test_button： 功能测试按钮
+        '''
+        self.open_comm_button = self.creat_setupwindow_button(self.comm_option_frame,"打开端口",28,self.open_comm_port,("仿宋",12,"bold"),(10,150))   
+        self.close_comm_button = self.creat_setupwindow_button(self.comm_option_frame,"关闭端口",28,self.close_comm_port,("仿宋",12,"bold"),(10,200),_state="disabled")
+        self.func_test_button = self.creat_setupwindow_button(self.comm_option_frame,"功能测试",28,self.main_func_test,("仿宋",12,"bold"),(400,150),_state="disabled")
 
-        self.SerialCheck_entry = ttk.Combobox(self.CommOption_frame, width=8, values=['NONE', 'ODD', 'EVEN'])  # 根据实际情况修改串口号列表
-        self.SerialCheck_entry.place(x=400,y=10)
-        self.SerialCheck_entry.set('NONE')
-        #USB
-        self.usb_devices = Comm_class.List_UsbCom()
-        self.USBComm = tk.Radiobutton(self.CommOption_frame, text="USB", variable=self.Comm_option, value="USB")
-        self.USBComm.place(x=10,y=40)
-        self.USBNumber_entry = ttk.Combobox(self.CommOption_frame, width=80)
-        self.USBNumber_entry['values'] = self.usb_devices
-        if  self.usb_devices:
-            self.USBNumber_entry.set(self.usb_devices[0])
-        self.USBNumber_entry.place(x=80,y=40)
-        self.USBNumber_entry.bind("<Button-1>", self.refresh_usb_devices)
+        '''
+            main_frame: 根组件
+            log_frame: 日志组件区域
 
-        #网口
-        self.EthernetComm = tk.Radiobutton(self.CommOption_frame, text="网口", variable=self.Comm_option, value="网口")
-        self.EthernetComm.place(x=10,y=70)      
-        self.EthernetIp = tk.Entry(self.CommOption_frame,width=18)
-        self.EthernetIp.place(x=80,y=70)
-        self.PortNum_label = tk.Label(self.CommOption_frame,text="端口号",font=("仿宋",12))
-        self.PortNum_label.place(x=250,y=70)   
-        self.PortNum_entry = tk.Entry(self.CommOption_frame,width=18)
-        self.PortNum_entry.place(x=310,y=70)   
-        #初始化网口地址
-        if self.ConfigData != None and self.ConfigData["EthIp"]:
-            self.EthernetIp.insert(0,self.ConfigData["EthIp"])
-        if self.ConfigData != None and self.ConfigData["EthPort"]:
-            self.PortNum_entry.insert(0,self.ConfigData["EthPort"])
-        #并口
-        self.LPTComm = tk.Radiobutton(self.CommOption_frame, text="LPT", variable=self.Comm_option, value="LPT")
-        self.LPTComm.place(x=10,y=100)     
-        self.LPTComm_entry = ttk.Combobox(self.CommOption_frame,width=18,values=['1'])
-        self.LPTComm_entry.place(x=80,y=100) 
+            log_clear_button: 清空日志
+            log_save_button: 保存日志
 
-        #打开端口
-        self.OpenPort_button = tk.Button(self.CommOption_frame, text="打开端口",width=28,command=self.OpenPort,font=("仿宋",12,"bold"))
-        self.OpenPort_button.place(x=10,y=150)     
- 
-        #关闭端口
-        self.ClosePort_button = tk.Button(self.CommOption_frame, text="关闭端口",width=28,command=self.ClosePort,font=("仿宋",12,"bold"))
-        self.ClosePort_button.place(x=10,y=200)     
-        self.ClosePort_button.config(state='disabled')
-
-        #测试
-        self.Test_button = tk.Button(self.CommOption_frame, text="测试",width=28,command=self.connect_test,font=("仿宋",12,"bold"))
-        self.Test_button.place(x=400,y=150) 
-        self.Test_button.config(state='disabled')
-
+        '''
         #创建一个日志文本框
-        self.log_frame = ttk.LabelFrame(self.frame,text="日志")
+        self.log_frame = ttk.LabelFrame(self.main_frame,text="日志")
         self.log_frame.place(x=0,y=270,width=700,height=200)
         self.log_scrollbar = ttk.Scrollbar(self.log_frame)
         self.log_scrollbar.grid(row=0, column=1, padx=1, pady=1,sticky='ns')
@@ -122,141 +177,215 @@ class StartUpWindow:
         self.log_text.grid(row=0, column=0, padx=1, pady=1)
         self.log_scrollbar.config(command=self.log_text.yview)
 
-        #清空日志按钮
-        Clear_log_button = tk.Button(self.log_frame, text="清空日志",width=8,command=self.Clear_log,font=("仿宋",12,"bold"))
-        Clear_log_button.grid(row=0, column=2, padx=1, pady=1,sticky='n')
-        #保存日志按钮
-        Save_log_button = tk.Button(self.log_frame, text="保存日志",width=8,command=self.Save_log,font=("仿宋",12,"bold"))
-        Save_log_button.grid(row=0, column=2, padx=1, pady=50,sticky='n')
+        self.log_clear_button = self.creat_setupwindow_button(self.log_frame,"清空日志",8,self.clear_log_message,("仿宋",12,"bold"),_position=(0,2,1,1,'n') ,_mode="grid")  
+        self.log_save_button = self.creat_setupwindow_button(self.log_frame,"保存日志",8,self.save_log_message,("仿宋",12,"bold"),_position=(0,2,1,50,'n') ,_mode="grid")  
+
 
     def refresh_usb_devices(self, event):
-        self.USBNumber_entry['values'] = []  # 清空值
-        self.USBNumber_entry.set('')
-        self.usb_devices = Comm_class.List_UsbCom()    # 刷新USB设备列表
-        self.USBNumber_entry['values'] = self.usb_devices  # 更新Combobox的值
+        '''
+            描述：刷新usb设备，点击(usb_device_combobox)组件后会重新刷新usb设备信息;
+        '''
+        self.usb_device_combobox['values'] = []  # 清空值
+        self.usb_device_combobox.set('')
+        self.usb_device_list = Comm_class.list_usb_devices()    # 刷新USB设备列表
+        self.usb_device_combobox['values'] = self.usb_device_list  # 更新Combobox的值
 
-    def refresh_serial_devices(self, event):
-        self.serial_devices = Comm_class.List_SerialCom()    # 刷新USB设备列表
-        self.SerialNum_entry['values'] = self.serial_devices  # 更新Combobox的值
+    def refresh_serial_port_lists(self, event):
+        '''
+            描述：刷新串口设备号，点击（serial_port_combobox）组件会重新刷新串口设备信息；
+        '''
+        self.serial_port_lists = Comm_class.list_serial_com()    # 刷新USB设备列表
+        self.serial_port_combobox['values'] = self.serial_port_lists  # 更新Combobox的值
 
-    def OpenSerial_port(self):
-        if not self.serial_devices:
-            messagebox.showerror("错误", "打开端口失败：未检测到串口设备")
-            log_message("打开端口失败：未检测到串口设备。",logging.ERROR)
-         # 禁用所有控件
+    def open_serial_port(self):
+        '''
+            描述：打开串口端口号；
+        '''
+        if not self.serial_port_lists:
+            messagebox.showerror(CONFIG['error_display']['error_name'], CONFIG['error_display']['serial_error_code']['no_device_detected'])
+            log_message(CONFIG['error_log_message']['serial_error_code']['no_device_detected'],logging.ERROR)
         else :
-            baudrate = int(self.Serialbaud_entry.get())
-            ret = Comm_class.Open_serialCom(self.SerialNum_entry.get(),baudrate)
+            baudrate = int(self.serial_baud_rate_entry.get())
+            ret = Comm_class.Open_serialCom(self.serial_port_combobox.get(),baudrate)
             if not ret:
-                messagebox.showerror("错误", "打开串口失败")
+                messagebox.showerror(CONFIG['error_display']['error_name'], CONFIG['error_display']['serial_error_code']['failed_to_open_port'])
+                log_message(CONFIG['error_log_message']['serial_error_code']['failed_to_open_port'],logging.ERROR)
                 return                
-            for widget in self.CommOption_frame.winfo_children():
+            for widget in self.comm_option_frame.winfo_children():
                 widget.config(state='disabled')
-            # 仅保留关闭端口按钮可用
-            self.ClosePort_button.config(state='normal')
-            self.Test_button.config(state='normal')  
-            log_message("打开串口",logging.DEBUG)
+            self.close_comm_button.config(state='normal')
+            self.func_test_button.config(state='normal')  
+            log_message(CONFIG['debug_log_message']['code_1'],logging.DEBUG)
 
-    def OpenUsb_port(self):
-        if not self.usb_devices:
-            messagebox.showerror("错误", "打开端口失败：未检测到USB设备。")
-            log_message("打开端口失败：未检测到USB设备",logging.ERROR)
-         # 禁用所有控件
+    def open_usb_port(self):
+        '''
+            描述：打开usb端口
+        '''
+        if not self.usb_device_list:
+            messagebox.showerror(CONFIG['error_display']['error_name'],CONFIG['error_display']['usb_error']['no_device_detected'])
+            log_message(CONFIG['error_log_message']['usb_error']['no_device_detected'],logging.ERROR)
         else :
             ret = Comm_class.Open_UsbCom() 
             if not ret :
-                messagebox.showerror("错误", "打开端口失败")
-                log_message("打开USB端口失败",logging.ERROR)
+                messagebox.showerror(CONFIG['error_display']['error_name'], CONFIG['error_display']['usb_error']['failed_to_open_port'])
+                log_message(CONFIG['error_log_message']['usb_error']['failed_to_open_port'],logging.ERROR)
                 return 
-            for widget in self.CommOption_frame.winfo_children():
+            for widget in self.comm_option_frame.winfo_children():
                 widget.config(state='disabled')
             # 仅保留关闭端口按钮可用
-            self.ClosePort_button.config(state='normal')
-            self.Test_button.config(state='normal')   
-            log_message("打开USB端口",logging.DEBUG)
-    def OpenEth_port(self):
-        EthernetIp = self.EthernetIp.get()
-        EthernetPort= int(self.PortNum_entry.get())
-        ret = Comm_class.Open_EthernetTcp(EthernetIp,EthernetPort)
+            self.close_comm_button.config(state='normal')
+            self.func_test_button.config(state='normal')   
+            log_message(CONFIG['debug_log_message']['code_2'],logging.DEBUG)
+
+    def open_network_port(self):
+        '''
+            描述：打开网络端口
+            变量:
+                eth_ip : 要连接的网络ip
+                eth_port: 要连接的端口号
+        '''
+        eth_ip = self.eth_ip_entry.get()
+        eth_port= int(self.eth_port_entry.get())
+        ret = Comm_class.Open_EthernetTcp(eth_ip,eth_port)
         if not ret:
-            messagebox.showerror("错误", "网络连接失败")
+            messagebox.showerror(CONFIG['error_display']['error_name'], CONFIG['error_display']['network_error']['connection_failed'])
             return                
-        for widget in self.CommOption_frame.winfo_children():
+        for widget in self.comm_option_frame.winfo_children():
             widget.config(state='disabled')
             # 仅保留关闭端口按钮可用
-        self.ClosePort_button.config(state='normal')
-        self.Test_button.config(state='normal')  
-        log_message("网络连接成功",logging.DEBUG)
+        self.close_comm_button.config(state='normal')
+        self.func_test_button.config(state='normal')  
+        log_message(CONFIG['debug_log_message']['code_3'],logging.DEBUG)
 
-    def OpenLpt_port(self):
+    def open_lpt_port(self):
+        '''
+            描述：打开并口，暂未实现
+        '''
         pass
 
     def handle_default(self):
+        '''
+            描述：通信方式回调，暂不实现
+        '''
         pass
 
-    def OpenPort(self):
-        CommType = self.Comm_option.get()
+    def open_comm_port(self):
+        '''
+            打开通信功能
+        '''
+        comm_type = self.comm_type.get()
         switcher = {
-            '串口' : self.OpenSerial_port,
-            'USB'  : self.OpenUsb_port,
-            '网口' : self.OpenEth_port,
-            'LPT'  : self.OpenLpt_port,
+            '串口' : self.open_serial_port,
+            'USB'  : self.open_usb_port,
+            '网口' : self.open_network_port,
+            'LPT'  : self.open_lpt_port,
         }
-        handler =  switcher.get(CommType, self.handle_default)
+        handler =  switcher.get(comm_type, self.handle_default)
         handler()
 
-    def ClosePort(self):
-        # 启用所有控件
-        for widget in self.CommOption_frame.winfo_children():
+    def close_comm_port(self):
+        '''
+            关闭通信功能
+        '''
+        for widget in self.comm_option_frame.winfo_children():
             widget.config(state='normal')
-        # 测试按钮置灰
-        self.Test_button.config(state='disabled')
-        self.ClosePort_button.config(state='disabled')
-        if  self.Comm_option.get() == "USB" :
+        self.func_test_button.config(state='disabled')
+        self.close_comm_button.config(state='disabled')
+        if  self.comm_type.get() == "USB" :
             Comm_class.Close_UsbCom()
-        elif self.Comm_option.get() == "串口":
+        elif self.comm_type.get() == "串口":
             Comm_class.Close_serialCom()
-        elif self.Comm_option.get() == "网口":
+        elif self.comm_type.get() == "网口":
             Comm_class.Close_EthernetTcp()
             
-    def connect_test(self):
+    def main_func_test(self):
+        '''
+            描述：主要功能测试
+        '''
         global Global_Comtype
-        Global_Comtype = self.Comm_option.get()
-        self.Open_mainUi()
-        # 清空文本框的log
+        Global_Comtype = self.comm_type.get()
+        self.open_main_ui()
         self.log_text.delete(1.0, tk.END)
 
 
-    def Open_mainUi(self):
+    def open_main_ui(self):
+        '''
+           描述： 打开主串口UI
+           self.root.withdraw(): 隐藏启动窗口
+        '''
         self.root.withdraw()
         main_ui = tk.Toplevel()
         MainUI(main_ui, self.root,self)
 
-    #清空队列，但是不清空log文件
-    def Clear_log(self):
-        #清空文本框的log
+    def clear_log_message(self):
+        '''
+            清除log信息
+        '''
         self.log_text.delete(1.0, tk.END)
-        #清空log文件
         Clear_logfile()
 
-    def Save_log(self):
-        content = self.log_text.get(1.0, tk.END)
-        # 弹出文件保存对话框
+    def save_log_message(self):
+        '''
+            保存log信息到指定目录
+        '''
+        log_data = self.log_text.get(1.0, tk.END)
         file_path = filedialog.asksaveasfilename(defaultextension=".txt", 
                                                filetypes=[("Text files", "*.txt"), 
                                                           ("All files", "*.*")])
         if file_path:  # 用户选择了文件路径
             with open(file_path, 'w') as file:
-                file.write(content)  # 将内容写入文件
+                file.write(log_data)  # 将内容写入文件
+
     def mainwindows(self):
-        #保存网口信息
+        '''
+            关闭启动窗口的时候，会调用该函数
+            variable:
+                config_data:  存储到配置文件的数据
+            ret : 返回值
+        '''
+
+        config_data = self.configparas_instance.get_config_data()
         ret = False
-        if self.ConfigData :
-            ret = Config_Data.Modify_Data("EthIp",value=self.EthernetIp.get())
-            ret &= Config_Data.Modify_Data("EthPort",value=self.PortNum_entry.get())
+        if config_data:
+            ret = self.configparas_instance.Modify_Data("EthIp",value=self.eth_ip_entry.get())
+            ret &= self.configparas_instance.Modify_Data("EthPort",value=self.eth_port_entry.get())
             if ret:
-                Config_Data.Save_Data()
+                self.configparas_instance.Save_Data()
         self.root.destroy()
+
+    def set_frame_position(self,frame,mode="place",_x = 0,_y=0,_height=0,_width=0):
+        '''
+            描述：用来设置组件的位置
+            frame:主框架
+            mode: 位置设置的方式：place，pack，grid
+            _x : x坐标
+            _y ：y坐标
+            _height：组件高度
+            _width ： 组件宽度
+        '''
+        if mode == "place":
+            if _height and _width:
+                frame.place(x=_x,y=_y,height=_height,width=_width)
+            else :
+                frame.place(x=_x,y=_y)
+        else :
+            pass
+    def creat_setupwindow_button(self,_frame,_name="按钮",_width=8,_command=None,_font=("仿宋",0),_position=(0,0,0,0,'n'),_mode="place",_state="normal"):
+        '''
+            描述：用来创建一个按钮
+            _frame:主框架
+            _name: 按钮的名称
+            _width: 按钮的宽度
+            _command：点击按钮后执行的命令函数
+            _font: 字体
+        '''
+        button = tk.Button(_frame, text=_name,width=_width,command=_command,font=_font)
+        if _mode == "place":
+            button.place(x=_position[0],y=_position[1])
+        elif _mode == "grid":
+            button.grid(row=_position[0], column=_position[1], padx=_position[2], pady=_position[3],sticky=_position[4])
+        button.config(state=_state)
+        return button
 
 class MainUI:
     def __init__(self, root,startup_window,startup_class):

@@ -4,7 +4,7 @@ import logging
 def Clear_logfile():
     with open("app.log", "w") as f:
         pass  # 清空文件内容
-def setup_logging():
+def logger_init():
     Clear_logfile()
     logging.basicConfig(level=logging.DEBUG, 
                         format='%(asctime)s - %(levelname)s - %(message)s',
